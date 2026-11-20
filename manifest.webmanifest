@@ -1,0 +1,21 @@
+{
+  "id": "/rijwijs/",
+  "name": "Rijwijs",
+  "short_name": "Rijwijs",
+  "description": "Rijwijs — آمادگی فارسی برای آزمون تئوری رانندگی هلند (CBR، گواهینامه B).",
+  "lang": "fa",
+  "dir": "rtl",
+  "start_url": "/rijwijs/?source=pwa",
+  "scope": "/rijwijs/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FFFCF5",
+  "theme_color": "#FFFCF5",
+  "icons": [
+    {"src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+    {"src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
+    {"src": "icons/maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable"},
+    {"src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"},
+    {"src": "icons/apple-touch-icon.png", "sizes": "180x180", "type": "image/png"}
+  ]
+}
