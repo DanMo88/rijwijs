@@ -1,4 +1,4 @@
-/* Rijwijs narration — Web Audio playback of pre-generated, silence-trimmed MP3s.
+/* CBR Daniel narration — Web Audio playback of pre-generated, silence-trimmed MP3s.
    The context is unlocked by the first user tap (e.g. «درس» on the lesson screen). */
 (function () {
   let ctx = null, src = null; const buf = {};
@@ -8,7 +8,7 @@
   async function load(name) {
     if (buf[name]) return buf[name];
     const c = ac(); if (!c) throw new Error('no webaudio');
-    let r; for (let k = 0; k < 3; k++) { try { r = await fetch('audio/' + name + '.mp3?v=4'); if (r.ok) break; } catch (e) {} await new Promise(ok => setTimeout(ok, 400)); }
+    let r; for (let k = 0; k < 3; k++) { try { r = await fetch('audio/' + name + '.mp3?v=' + (window.RW_AUDIO && RW_AUDIO[name] || 5)); if (r.ok) break; } catch (e) {} await new Promise(ok => setTimeout(ok, 400)); }
     if (!r || !r.ok) throw new Error('fetch ' + name);
     const ab = await r.arrayBuffer();
     buf[name] = await new Promise((ok, no) => c.decodeAudioData(ab, ok, no));

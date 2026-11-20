@@ -1,0 +1,10 @@
+<!doctype html><meta charset="utf-8"><base href="../"><link rel="stylesheet" href="css/styles.css">
+<style>body{background:#fff;margin:0;font-family:Vazirmatn}#g{display:grid;grid-template-columns:repeat(6,200px);gap:6px;padding:6px}.c{border:1px solid #ddd;font-size:9px;direction:rtl}.c svg{width:200px;height:200px;display:block}</style>
+<div id="g"></div>
+<script src="js/data/core.js"></script><script src="js/data/signs.js"></script>
+<script>[1,2,3,4,5,6,7,8].forEach(n=>document.write('<script src="js/data/ch'+n+'.js"><\/script>'))</script>
+<script src="js/diagram.js"></script><script src="js/scenes.js"></script>
+<script>
+var p=new URLSearchParams(location.search),lid=p.get('l'),from=+(p.get('f')||0),n=+(p.get('n')||36),l=RW.lessons[lid],items=l.cards.map((c,i)=>['C'+(i+1)+' '+c.t,c.s]).concat(l.qs.map(q=>[q.id+' '+q.type+' '+q.q,q.s]));
+document.getElementById('g').innerHTML=items.slice(from,from+n).map(x=>'<div class="c">'+Scene.render(x[1]).replace('class="scene"','')+'<div>'+x[0].replace(/<[^>]+>/g,'').slice(0,90)+'</div></div>').join('');
+</script>

@@ -31,6 +31,7 @@
     arms.forEach(function (a) {
       o += '<g transform="rotate(' + ROT[a] + ' 150 150)">';
       if (sp.teeth && sp.teeth.indexOf(a) >= 0) { for (var x = 151; x < 184; x += 8.2) o += '<path d="M' + x + ',189 l7,0 l-3.5,9z" fill="#fff"/>'; }
+      if (sp.zebra && sp.zebra.indexOf(a) >= 0) { for (var zx = 118; zx < 184; zx += 11) o += '<rect x="' + zx + '" y="196" width="7" height="22" fill="#fff"/>'; }
       if (sp.stopline && sp.stopline.indexOf(a) >= 0) o += '<rect x="151" y="189" width="34" height="4" fill="#fff"/><text x="168" y="216" font-size="9" font-weight="900" fill="#fff" text-anchor="middle" font-family="Arial">STOP</text>';
       o += '</g>';
     });
@@ -66,6 +67,12 @@
       return '<rect x="-2" y="-12" width="4" height="24" rx="2" fill="#333"/><rect x="-7" y="-6" width="14" height="3" rx="1.5" fill="#333"/>' +
         '<ellipse cx="0" cy="2" rx="7" ry="5.5" fill="' + col + '"/><circle cx="0" cy="-1" r="' + (k === 'moped' ? 4.6 : 3.8) + '" fill="' + (k === 'moped' ? '#222' : '#F0C9A0') + '"/>';
     }
+    if (k === 'ped') return '<circle cx="0" cy="0" r="7" fill="' + col + '"/><circle cx="0" cy="0" r="4" fill="#F0C9A0"/>';
+    if (k === 'kid') return '<circle cx="0" cy="0" r="5.5" fill="#E45D8C"/><circle cx="0" cy="0" r="3.2" fill="#F0C9A0"/>';
+    if (k === 'bus' || k === 'truck') return '<rect x="-12" y="-34" width="24" height="68" rx="4" fill="' + (k === 'bus' ? '#F2C200' : col) + '" stroke="rgba(0,0,0,.2)"/><rect x="-9" y="-30" width="18" height="7" rx="2" fill="#2E3A44" opacity=".8"/>' + (k === 'truck' ? '<rect x="-12" y="-18" width="24" height="2" fill="rgba(0,0,0,.25)"/>' : '<text x="0" y="6" font-size="8" font-weight="900" fill="#5E3A22" text-anchor="middle" font-family="Arial" transform="rotate(90)">BUS</text>');
+    if (k === 'tractor') return '<rect x="-11" y="-6" width="22" height="22" rx="3" fill="#5BB36A"/><rect x="-7" y="-18" width="14" height="13" rx="2" fill="#5BB36A"/><rect x="-14" y="2" width="5" height="14" rx="2" fill="#333"/><rect x="9" y="2" width="5" height="14" rx="2" fill="#333"/><rect x="-6" y="-2" width="12" height="8" rx="1" fill="#2E3A44" opacity=".7"/>';
+    if (k === 'moto') return '<rect x="-3" y="-15" width="6" height="30" rx="3" fill="#333"/><ellipse cx="0" cy="1" rx="7" ry="7" fill="' + col + '"/><circle cx="0" cy="-1" r="4.5" fill="#222"/>';
+    if (k === 'pol') return '<rect x="-10" y="-18" width="20" height="36" rx="6" fill="#fff" stroke="#C9C9C9"/><rect x="-7.5" y="-12" width="15" height="7" rx="2" fill="#2E3A44" opacity=".8"/><rect x="-10" y="0" width="20" height="5" fill="#1F4FB3"/><rect x="-10" y="5" width="20" height="2.5" fill="#E8734A"/><rect x="-6" y="-4" width="12" height="3" rx="1" fill="#1E6FFF"/>';
     if (k === 'tram') return '<rect x="-12" y="-42" width="24" height="84" rx="7" fill="#F2F2F2" stroke="#2F6FB0" stroke-width="3"/><rect x="-8" y="-38" width="16" height="9" rx="2" fill="#2F6FB0"/><text x="0" y="6" font-size="8" font-weight="900" fill="#2F6FB0" text-anchor="middle" font-family="Arial" transform="rotate(90)">TRAM</text>';
     if (k === 'van') return '<rect x="-11" y="-24" width="22" height="48" rx="5" fill="' + col + '"/><rect x="-8" y="-20" width="16" height="7" rx="2" fill="#2E3A44" opacity=".75"/>';
     var amb = k === 'amb';
@@ -121,17 +128,19 @@
   function render(sp) {
     if (!sp) return '';
     var vbH = sp.h || 300, inner = '';
-    if (sp.type === 'signs') inner = signsBoard(sp);
+    if (window.SceneX && SceneX[sp.type]) inner = SceneX[sp.type](sp, { unit: unit, body: body, signAt: signAt, lightAt: lightAt, esc: esc });
+    else if (sp.type === 'signs') inner = signsBoard(sp);
     else if (sp.type === 'ladder') inner = ladder();
     else {
       inner = roads(sp);
       (sp.signsAt || []).forEach(function (s) { inner += signAt(s[0], s[1], s[2]); });
       (sp.lights || []).forEach(function (l) { inner += lightAt(l[0], l[1]); });
       (sp.units || []).forEach(function (u, i) { inner += unit(u, i, sp); });
+      if (sp.wx && window.SceneX) inner += SceneX.wx(sp.wx);
       if (sp.note) inner += '<rect x="8" y="8" width="' + (sp.note.length * 7.2 + 18) + '" height="24" rx="12" fill="rgba(255,255,255,.92)"/><text x="17" y="25" font-size="12" font-weight="700" fill="#5E3A22" font-family="Fredoka, Arial">' + esc(sp.note) + '</text>';
       if (sp.mark) inner += sp.mark;
     }
     return '<svg class="scene" viewBox="0 0 300 ' + vbH + '" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="' + esc(sp.alt || '') + '">' + inner + '</svg>';
   }
-  window.Scene = { render: render };
+  window.Scene = { render: render, body: body, esc: esc };
 })();

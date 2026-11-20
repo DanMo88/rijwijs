@@ -1,8 +1,8 @@
 {
   "id": "/rijwijs/",
-  "name": "Rijwijs",
-  "short_name": "Rijwijs",
-  "description": "Rijwijs — آمادگی فارسی برای آزمون تئوری رانندگی هلند (CBR، گواهینامه B).",
+  "name": "CBR Daniel",
+  "short_name": "CBR Daniel",
+  "description": "CBR Daniel — آمادگی فارسی برای آزمون تئوری رانندگی هلند (CBR، گواهینامه B).",
   "lang": "fa",
   "dir": "rtl",
   "start_url": "/rijwijs/?source=pwa",
