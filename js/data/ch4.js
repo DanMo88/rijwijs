@@ -1,1 +1,227 @@
-/* Chapter 4 */
+/* Chapter 4 — Veilig rijden en noodsituaties. RVV 1990 art. 19, 28, 32, 34, 38, 41, 43, 53, 58; WVW 1994 art. 5.
+   Distances and stopping-distance numbers are rules of thumb (vuistregels), marked as such in the text. */
+(function () {
+  const { C, mc, yn, num, hot, ord, mul, anim, L, pic } = RW.h;
+  const rd = o => Object.assign({ type: 'road' }, o), P = (t, o) => pic(t, o);
+  const S = (s, c, x) => Object.assign({ s: s, c: c }, x || {}), I = (i, c, x) => Object.assign({ i: i, c: c }, x || {});
+  const two = (o) => rd(Object.assign({ L: [{ d: 'dn' }, { d: 'up' }], marks: ['dash'] }, o));
+
+  /* ---------------- 4.1 afstand en remweg ---------------- */
+  const stopGen = () => [40, 60, 80, 100, 120].map(v => {
+    const r = v / 10 * 3, b = (v / 10) * (v / 10) / 2;
+    return num('با قاعدهٔ سرانگشتی، مسافت <b>توقف کامل</b> (واکنش + ترمز) روی جادهٔ <b>خشک</b> با سرعت <b>' + v + '</b> km/h حدوداً چند متر است؟', 'Stopafstand bij ' + v + ' km/h (droog, vuistregel)?', r + b,
+      'واکنش: ' + v + '÷۱۰×۳ = <b>' + r + '</b> متر. ترمز: (' + v + '÷۱۰)²÷۲ = <b>' + b + '</b> متر. جمع: <b>' + (r + b) + ' متر</b>. اینها قاعدهٔ سرانگشتی‌اند؛ در واقعیت به ماشین، لاستیک و جاده بستگی دارد.', 'vuistregel · RVV ماده ۱۹',
+      P([I('sp:' + v, v + ' km/h'), I('dist2', '? m')]), 'stopafstand|stopping distance');
+  });
+  L({ id: 'afstand', ch: 4, fa: 'فاصله و مسافت ترمز', nl: 'Afstand houden en remweg', en: 'Following distance and stopping',
+    cards: [
+      C('قاعدهٔ دو ثانیه', 'twee seconden afstand', 'two-second rule',
+        'پشت ماشین جلویی دست‌کم <b>۲ ثانیه</b> فاصله نگه دار: وقتی ماشین جلو از کنار یک تیر رد شد، بشمار «۲۱، ۲۲». اگر قبل از تمام شدن به تیر رسیدی، خیلی نزدیکی. در باران و تاریکی بیشتر.', 'vuistregel · RVV ماده ۱۹ و WVW ماده ۵',
+        two({ units: [{ id: 'a', ln: 1, y: 90 }, { id: 'you', ln: 1, y: 230 }], dist: [[240, 110, 210, '2 s']] })),
+      C('مسافت توقف = واکنش + ترمز', 'stopafstand = reactieafstand + remweg', 'stopping distance',
+        'از لحظه‌ای که خطر را می‌بینی تا پایت روی ترمز برود، حدود <b>۱ ثانیه</b> طول می‌کشد (مسافت واکنش). بعد ماشین تا توقف کامل مسافت ترمز را می‌رود. جمع این دو = <b>مسافت توقف</b>.', 'vuistregel',
+        P([I('eye', 'zien'), I('clock', 'reactie ±1 s'), I('brake', 'remmen'), I('stopd', 'stilstand')])),
+      C('قاعده‌های سرانگشتی', 'vuistregels', 'rules of thumb',
+        'مسافت واکنش ≈ <b>سرعت ÷ ۱۰ × ۳</b> متر. مسافت ترمز روی جادهٔ خشک ≈ <b>(سرعت ÷ ۱۰)² ÷ ۲</b> متر. مثال در ۵۰: واکنش ۱۵ متر + ترمز حدود ۱۲٫۵ متر ≈ <b>۲۷٫۵ متر</b>.', 'vuistregel',
+        P([I('txt:50', 'km/h'), I('txt:15 m', 'reactie'), I('txt:12,5 m', 'remweg')], { cols: 3, h: 200 })),
+      C('سرعت دو برابر، ترمز چهار برابر', 'dubbele snelheid = 4× remweg', 'double speed = 4× braking distance',
+        'مسافت ترمز با <b>مربع سرعت</b> زیاد می‌شود: اگر سرعتت دو برابر شود، مسافت ترمز <b>چهار برابر</b> می‌شود. پس چند کیلومتر بیشتر فرق بزرگی می‌سازد.', 'فیزیک ترمز',
+        P([I('sp:50', '× 1'), I('sp:100', '× 4')])),
+      C('جادهٔ خیس و یخ', 'nat · glad', 'wet · icy',
+        'روی جادهٔ <b>خیس</b> مسافت ترمز تقریباً <b>دو برابر</b> می‌شود؛ روی <b>یخ</b> خیلی بیشتر (تا حدود ۱۰ برابر). مسافت واکنش عوض نمی‌شود. پس فاصله را بیشتر کن.', 'vuistregel · RVV ماده ۱۹',
+        P([I('rain', 'nat ≈ ×2'), I('ice', 'ijs ≫')])),
+      C('عوامل واکنش', 'reactietijd', 'reaction time',
+        '<b>خستگی، الکل، دارو، موبایل و حواس‌پرتی</b> زمان واکنش را خیلی بیشتر می‌کنند. با تمرکز و <b>پیش‌بینی</b> (anticiperen) می‌توانی زودتر واکنش نشان دهی.', 'RVV ماده ۶۱a و WVW ماده ۸',
+        P([I('sleep', 'moe'), I('beer', 'alcohol'), I('phone', 'telefoon'), I('eye', 'opletten')])),
+      C('فاصله از پهلو', 'zijdelingse afstand', 'side distance',
+        'از دوچرخه، موتور، ماشین‌های پارک‌شده و کارگران جاده <b>فاصلهٔ جانبی کافی</b> بگیر؛ هر چه سریع‌تر، بیشتر. یک در باز یا یک تکان کوچک کافی است.', 'WVW ماده ۵',
+        two({ side: 'city', parked: [['r', 120]], units: [{ id: 'you', ln: 1, y: 200, dx: -8 }], dist: [[205, 130, 131, '']] })),
+      C('کسی به تو چسبیده', 'bumperklever', 'tailgater',
+        'اگر کسی خیلی نزدیک پشت توست، <b>ترمز ناگهانی</b> نکن و جلوی خودت فاصلهٔ <b>بیشتری</b> بگذار تا اگر لازم شد آرام ترمز کنی. اگر می‌شود بگذار رد شود.', 'WVW ماده ۵',
+        two({ units: [{ id: 'a', ln: 1, y: 80 }, { id: 'you', ln: 1, y: 170 }, { id: 'b', ln: 1, y: 222 }] })),
+      C('ترمز اضطراری با ABS', 'noodstop met ABS', 'emergency stop with ABS',
+        'در ترمز اضطراری با <b>ABS</b>: پدال ترمز (و کلاچ در دنده دستی) را <b>محکم و تا آخر</b> فشار بده و نگه دار؛ لرزش پدال طبیعی است. با ABS می‌توانی هنگام ترمز فرمان بدهی و از مانع بگذری.', 'Regeling voertuigen · ABS',
+        P([I('abs', 'ABS'), I('brake', 'vol remmen')])),
+      C('فاصله در تونل و صف', 'afstand in file en tunnel', 'distance in queues and tunnels',
+        'وقتی در صف می‌ایستی، چنان فاصله‌ای بگذار که <b>چرخ‌های عقب</b> ماشین جلو را ببینی؛ اگر خراب شد می‌توانی دور بزنی. در تونل فاصله را از قبل زیادتر کن.', 'vuistregel',
+        two({ units: [{ id: 'a', ln: 1, y: 100 }, { id: 'you', ln: 1, y: 200 }] }))
+    ],
+    gen: stopGen,
+    qs: [
+      mc('حداقل فاصلهٔ توصیه‌شده پشت ماشین جلویی در شرایط خوب چقدر است؟', 'Hoeveel afstand houd je minimaal?', [['۲ ثانیه', '2 seconden'], ['۱ متر', '1 meter'], ['یک طول ماشین', 'één autolengte']], 0, 'قاعدهٔ <b>۲ ثانیه</b>؛ در باران، تاریکی یا با تریلر بیشتر.', 'vuistregel · WVW ماده ۵', two({ units: [{ id: 'a', ln: 1, y: 90 }, { id: 'you', ln: 1, y: 230 }] }), 'afstand houden|following distance'),
+      mc('سرعتت از ۵۰ به ۱۰۰ می‌رسد. مسافت ترمز چند برابر می‌شود؟', 'Van 50 naar 100: remweg wordt…', [['۴ برابر', '4×'], ['۲ برابر', '2×'], ['همان', 'gelijk']], 0, 'مسافت ترمز با <b>مربع</b> سرعت زیاد می‌شود: ۲² = <b>۴</b>.', 'فیزیک ترمز', P([I('sp:50'), I('sp:100')]), 'remweg|braking distance'),
+      mc('روی جادهٔ خیس مسافت ترمز تقریباً چه می‌شود؟', 'Remweg op een nat wegdek?', [['حدود ۲ برابر', 'ongeveer 2×'], ['همان', 'gelijk'], ['نصف', 'de helft']], 0, 'جادهٔ خیس: تقریباً <b>دو برابر</b>.', 'vuistregel', P([I('rain')]), 'nat wegdek|wet road'),
+      yn('روی جادهٔ خیس، <b>مسافت واکنش</b> بیشتر می‌شود؟', 'Wordt de reactieafstand groter bij regen?', false, 'نه. مسافت واکنش به <b>سرعت و تو</b> بستگی دارد، نه جاده. مسافت <b>ترمز</b> بیشتر می‌شود.', 'vuistregel', P([I('rain'), I('clock', 'reactie')]), 'reactieafstand|reaction distance'),
+      mul('چه چیزهایی زمان واکنش تو را <b>بیشتر</b> می‌کند؟', 'Wat maakt je reactietijd langer?', [['خستگی', 'vermoeidheid'], ['نوشیدن الکل', 'alcohol'], ['نگاه به موبایل', 'telefoon'], ['تمرکز روی جاده', 'opletten']], [0, 1, 2], 'خستگی، الکل و موبایل واکنش را کند می‌کنند.', 'WVW ماده ۸ و RVV ماده ۶۱a', P([I('sleep'), I('beer'), I('phone'), I('eye')]), 'reactietijd|reaction time'),
+      num('با قاعدهٔ سرانگشتی، مسافت <b>واکنش</b> در سرعت ۸۰ چند متر است؟', 'Reactieafstand bij 80 km/h (vuistregel)?', 24, '۸۰ ÷ ۱۰ × ۳ = <b>۲۴ متر</b>.', 'vuistregel', P([I('sp:80')]), 'reactieafstand|reaction distance'),
+      num('با قاعدهٔ سرانگشتی، مسافت <b>ترمز</b> روی جادهٔ خشک در سرعت ۶۰ چند متر است؟', 'Remweg bij 60 km/h droog (vuistregel)?', 18, '(۶۰ ÷ ۱۰)² ÷ ۲ = ۳۶ ÷ ۲ = <b>۱۸ متر</b>.', 'vuistregel', P([I('sp:60')]), 'remweg|braking distance'),
+      mc('کسی خیلی نزدیک پشت تو می‌راند. بهترین کار؟', 'Iemand rijdt te dicht achter je. Wat doe je?', [['فاصلهٔ جلویم را بیشتر می‌کنم و آرام می‌رانم', 'meer ruimte voor je'], ['ناگهان ترمز می‌کنم تا بفهمد', 'kort remmen'], ['سرعتم را زیاد می‌کنم', 'harder rijden']], 0, 'با فاصلهٔ بیشتر جلو، می‌توانی <b>آرام‌تر</b> ترمز کنی و او هم وقت دارد. ترمز تنبیهی خطرناک و غیرقانونی است.', 'WVW ماده ۵', two({ units: [{ id: 'a', ln: 1, y: 80 }, { id: 'you', ln: 1, y: 170 }, { id: 'b', ln: 1, y: 222 }] }), 'bumperkleven|tailgating'),
+      mc('ترمز اضطراری با ABS: چه می‌کنی؟', 'Noodstop met ABS. Wat doe je?', [['پدال را محکم تا آخر فشار می‌دهم و نگه می‌دارم', 'vol en blijven remmen'], ['پدال را چند بار فشار و رها می‌کنم', 'pompen'], ['آرام ترمز می‌کنم', 'zacht remmen']], 0, 'با ABS <b>محکم و ممتد</b> ترمز کن؛ ABS خودش قفل نشدن چرخ را مدیریت می‌کند.', 'Regeling voertuigen · ABS', P([I('abs')]), 'ABS|ABS'),
+      yn('با ABS اجازه داری هنگام ترمز اضطراری فرمان بدهی تا از مانع بگذری؟', 'Kun je met ABS sturen tijdens het remmen?', true, 'بله. ABS نمی‌گذارد چرخ‌ها قفل شوند، پس ماشین فرمان‌پذیر می‌ماند.', 'Regeling voertuigen · ABS', P([I('abs'), I('wheel', 'sturen')]), 'ABS|ABS'),
+      mc('در صف پشت ماشین می‌ایستی. چه فاصله‌ای؟', 'Hoeveel afstand in de file bij stilstand?', [['آن‌قدر که چرخ‌های عقب او را ببینم', 'achterwielen zien'], ['چسبیده به او', 'bumper aan bumper'], ['۵۰ متر', '50 meter']], 0, 'دیدن چرخ‌های عقب = جا برای دور زدن اگر ماشین جلو خراب شود.', 'vuistregel', two({ units: [{ id: 'a', ln: 1, y: 100 }, { id: 'you', ln: 1, y: 200 }] }), 'file|queue'),
+      mc('از کنار ماشین‌های پارک‌شده می‌گذری. چه فاصله‌ای می‌گذاری؟', 'Langs geparkeerde auto’s: hoeveel ruimte?', [['حدود یک در باز', 'een openslaande deur'], ['هر چه نزدیک‌تر', 'zo dicht mogelijk'], ['مهم نیست', 'maakt niet uit']], 0, 'در ممکن است ناگهان باز شود یا کسی بیرون بیاید.', 'WVW ماده ۵', two({ side: 'city', parked: [['r', 120]], units: [{ id: 'you', ln: 1, y: 200, dx: -8 }] }), 'zijdelingse afstand|side distance'),
+      yn('با تریلر هم قاعدهٔ ۲ ثانیه کافی است؟', 'Is 2 seconden genoeg met aanhanger?', false, 'با تریلر ماشین سنگین‌تر است و دیرتر می‌ایستد؛ <b>فاصلهٔ بیشتر</b> بگیر.', 'vuistregel · WVW ماده ۵', P([I('trailer')]), 'aanhangwagen|trailer'),
+      mc('در مه با دید ۵۰ متر. حداکثر سرعتی که با آن می‌توانی در ۵۰ متر بایستی (خشک) حدوداً؟', 'Zicht 50 m. Welke snelheid ongeveer?', [['حدود ۶۰ یا کمتر', '±60 of minder'], ['۸۰', '80'], ['۱۰۰', '100']], 0, 'با قاعدهٔ سرانگشتی در ۶۰: ۱۸ + ۱۸ = ۳۶ متر؛ در ۸۰: ۲۴ + ۳۲ = ۵۶ متر (بیشتر از ۵۰). در مه جاده هم معمولاً خیس است، پس آهسته‌تر.', 'RVV ماده ۱۹ · vuistregel', two({ wx: 'fog', units: [{ id: 'you', ln: 1 }] }), 'zicht|visibility'),
+      anim('فیلم را ببین. ماشین جلویی ناگهان ترمز می‌کند. چه می‌کنی؟', 'Wat doe je?', [['ترمز می‌کنم', 'remmen'], ['هیچ کاری، فاصله کافی است', 'niets'], ['بوق می‌زنم', 'toeteren']], 0, 'چراغ ترمز روشن شد: پایت را از گاز بردار و ترمز کن. فاصلهٔ ۲ ثانیه این‌جا به تو وقت می‌دهد.', 'WVW ماده ۵', two({ units: [{ id: 'a', ln: 1, y: 100, brake: true, anim: [0, 1.4, 0.5] }, { id: 'you', ln: 1, y: 230, anim: [40, 0, 2.5] }] }), 'remmen|braking')
+    ]
+  });
+
+  /* ---------------- 4.2 zicht, verlichting en weer ---------------- */
+  L({ id: 'zicht', ch: 4, fa: 'دید، چراغ‌ها و آب‌وهوا', nl: 'Zicht, verlichting en weer', en: 'Visibility, lights and weather',
+    cards: [
+      C('شب و دید بد: dimlicht', 'dimlicht', 'dipped beam',
+        'در <b>شب</b> و در روزی که <b>دید خیلی کم</b> است، <b>dimlicht</b> (نور پایین) روشن کن. چراغ عقب و چراغ پلاک همیشه با آن روشن است.', 'RVV ماده ۳۲ بند ۱ و ۳',
+        P([I('dim', 'dimlicht'), I('night', 'nacht')])),
+      C('نور بالا (grootlicht)', 'groot licht', 'main beam',
+        '<b>grootlicht</b> در شب به جای dimlicht مجاز است، <b>به جز</b>: در روز، وقتی کسی از روبه‌رو می‌آید (پیاده و دوچرخه هم)، و وقتی <b>نزدیک پشت</b> ماشین دیگری هستی.', 'RVV ماده ۳۲ بند ۲',
+        P([I('high', 'groot licht'), I('car2', 'tegenligger', { x: 1 })])),
+      C('چراغ مه‌شکن جلو', 'mistlicht voor', 'front fog lights',
+        'در <b>مه، برف یا باران</b> که دید را خیلی کم کرده، می‌توانی چراغ مه‌شکن جلو روشن کنی (به جای dimlicht).', 'RVV ماده ۳۴ بند ۱',
+        P([I('fogf', 'mistlicht'), I('fog', '')])),
+      C('چراغ مه‌شکن عقب: زیر ۵۰ متر', 'mistachterlicht < 50 m', 'rear fog light below 50 m',
+        '<b>mistachterlicht</b> (چراغ قرمز پرنور عقب) فقط در <b>مه یا برف</b> وقتی دید <b>کمتر از ۵۰ متر</b> است. در باران نه؛ رانندهٔ پشت سر را کور می‌کند و چراغ ترمز را پنهان می‌کند.', 'RVV ماده ۳۴ بند ۲',
+        P([I('fogr', 'mistachterlicht'), I('txt:< 50 m', 'mist / sneeuw')])),
+      C('چراغ روز (dagrijlicht)', 'dagrijlicht', 'daytime running lights',
+        '<b>dagrijlicht</b> فقط در روز است و همزمان با چراغ‌های دیگر جلو نمی‌سوزد. وقتی هوا تاریک می‌شود یا در تونل، dimlicht روشن کن؛ dagrijlicht در خیلی ماشین‌ها چراغ عقب ندارد.', 'RVV ماده ۴۱ بند ۱',
+        P([I('drl', 'dagrijlicht'), I('dim', 'dimlicht ’s avonds')])),
+      C('ایستادن در تاریکی بیرون شهر', 'stadslicht bij stilstand', 'parking lights',
+        'اگر بیرون شهر در شب یا دید بد روی رایبان یا شانهٔ autosnelweg می‌ایستی، <b>stadslicht</b> و چراغ عقب را روشن بگذار.', 'RVV ماده ۳۸',
+        two({ wx: 'night', units: [{ id: 'you', ln: 1, dx: 12 }] })),
+      C('نور خورشید پایین', 'laagstaande zon', 'low sun',
+        'خورشید پایین صبح و عصر چشم را کور می‌کند و تو را برای دیگران پنهان می‌کند. <b>آفتاب‌گیر</b>، شیشهٔ تمیز و عینک آفتابی کمک می‌کنند؛ آهسته‌تر بران.', 'RVV ماده ۱۹',
+        two({ wx: 'sun', units: [{ id: 'you', ln: 1 }] })),
+      C('باران و آب‌سواری', 'aquaplaning', 'aquaplaning',
+        'با آب زیاد روی جاده، لاستیک ممکن است روی آب سُر بخورد (<b>aquaplaning</b>): فرمان سبک می‌شود. <b>گاز را رها کن</b>، فرمان را صاف نگه دار و ترمز ناگهانی نکن. عمق آج لاستیک مهم است.', 'RVV ماده ۱۹',
+        P([I('water', 'aquaplaning'), I('tread', 'profiel')])),
+      C('یخ و برف', 'gladheid', 'ice and snow',
+        'روی یخ و برف <b>آرام</b> شتاب بگیر، آرام ترمز کن، آرام فرمان بده و فاصله را خیلی زیاد کن. <b>پل‌ها</b> و سایه‌ها زودتر یخ می‌زنند. تابلوی <b>J36</b> هشدار یخ یا برف است.', 'RVV ماده ۱۹ و پیوست ۱ (J36)',
+        P([S('J36', 'J36'), I('ice', 'glad')])),
+      C('باد جانبی', 'zijwind J31', 'crosswind',
+        'در باد شدید جانبی، مخصوصاً روی پل، بیرون از پشت کامیون یا جنگل، فرمان را محکم بگیر و آهسته‌تر بران. تابلوی <b>J31</b> هشدار باد جانبی است.', 'پیوست ۱ (J31)',
+        P([S('J31', 'J31'), I('wind', 'wind')]))
+    ],
+    qs: [
+      yn('شب است و جاده روشن است. باید dimlicht روشن کنی؟', 'Moet je ’s nachts dimlicht voeren, ook met straatverlichting?', true, 'بله. قانون می‌گوید <b>در شب</b> dimlicht، بدون توجه به نور خیابان.', 'RVV ماده ۳۲ بند ۱', two({ side: 'city', wx: 'night', units: [{ id: 'you', ln: 1 }] }), 'dimlicht|dipped beam'),
+      mul('کی <b>نباید</b> grootlicht روشن کنی؟', 'Wanneer geen groot licht?', [['وقتی ماشینی از روبه‌رو می‌آید', 'tegenligger'], ['وقتی نزدیک پشت ماشین دیگری هستی', 'dicht achter een ander'], ['در روز', 'overdag'], ['در جادهٔ تاریک و خالی', 'donkere lege weg']], [0, 1, 2], 'در جادهٔ تاریکِ خالی grootlicht مجاز است.', 'RVV ماده ۳۲ بند ۲', P([I('high'), I('car2'), I('sun'), I('night')]), 'groot licht|main beam'),
+      yn('دوچرخه‌سواری از روبه‌رو می‌آید. grootlicht را خاموش می‌کنی؟', 'Fietser tegemoet: groot licht uit?', true, 'بله. «تَگِن‌کومن» با <b>هر</b> کاربر دیگر جاده، نه فقط ماشین.', 'RVV ماده ۳۲ بند ۲ ب', two({ wx: 'night', units: [{ id: 'you', ln: 1 }, { id: 'b', kind: 'bike', ln: 0, y: 80, dn: true }] }), 'groot licht|main beam'),
+      mc('باران شدید است و دید ۸۰ متر. mistachterlicht روشن می‌کنی؟', 'Zware regen, zicht 80 m: mistachterlicht?', [['نه', 'nee'], ['بله', 'ja']], 0, 'mistachterlicht فقط در <b>مه یا برف</b> و دید <b>کمتر از ۵۰ متر</b>. در باران هرگز.', 'RVV ماده ۳۴ بند ۲', P([I('rain'), I('fogr')]), 'mistachterlicht|rear fog light'),
+      mc('در مه، دید ۳۰ متر است. mistachterlicht مجاز است؟', 'Mist, zicht 30 m: mistachterlicht?', [['بله', 'ja'], ['نه', 'nee']], 0, 'مه و دید <b>زیر ۵۰ متر</b>: مجاز است.', 'RVV ماده ۳۴ بند ۲', two({ wx: 'fog', units: [{ id: 'you', ln: 1 }] }), 'mistachterlicht|rear fog light'),
+      num('mistachterlicht فقط وقتی مجاز است که دید کمتر از چند متر باشد؟', 'Onder hoeveel meter zicht mag mistachterlicht?', 50, 'کمتر از <b>۵۰ متر</b>، و فقط در مه یا برف.', 'RVV ماده ۳۴ بند ۲', P([I('fogr')]), 'mistachterlicht|rear fog light'),
+      mc('کدام چراغ در <b>باران شدید</b> با دید کم مجاز است؟', 'Welk licht mag bij zware regen?', [['چراغ مه‌شکن جلو', 'mistlicht voor'], ['چراغ مه‌شکن عقب', 'mistachterlicht'], ['چراغ خطر در حال رانندگی', 'alarmlichten']], 0, 'mistlicht جلو در مه، برف <b>یا باران</b> که دید را خیلی کم کرده، مجاز است.', 'RVV ماده ۳۴ بند ۱', P([I('fogf'), I('rain')]), 'mistlicht|fog light'),
+      hot('روی چراغی بزن که <b>mistachterlicht</b> را نشان می‌دهد.', 'Klik op het lampje van het mistachterlicht.', 'b', 'نماد mistachterlicht: لامپ با خطوط <b>صاف</b> و یک خط موج‌دار، معمولاً نارنجی/زرد.', 'Regeling voertuigen', P([I('fogf', '', { hot: 'a' }), I('fogr', '', { hot: 'b' }), I('dim', '', { hot: 'c' }), I('high', '', { hot: 'd' })]), 'mistachterlicht|rear fog light'),
+      hot('روی نماد <b>grootlicht</b> بزن.', 'Klik op groot licht.', 'd', 'نماد آبی با خطوط صاف افقی: grootlicht.', 'Regeling voertuigen', P([I('fogf', '', { hot: 'a' }), I('drl', '', { hot: 'b' }), I('dim', '', { hot: 'c' }), I('high', '', { hot: 'd' })]), 'groot licht|main beam'),
+      yn('dagrijlicht در تونل تاریک کافی است؟', 'Is dagrijlicht genoeg in een tunnel?', false, 'نه. در تونل و هوای تاریک <b>dimlicht</b> روشن کن؛ dagrijlicht فقط برای روز است و چراغ عقب را روشن نمی‌کند.', 'RVV ماده ۳۲ و ۴۱', rd({ side: 'hwy', L: [{ d: 'up' }, { d: 'up' }], marks: ['dash'], tunnel: 200, units: [{ id: 'you', ln: 1 }] }), 'dagrijlicht|daytime running lights'),
+      mc('فرمان ناگهان سبک شد و آب زیادی روی جاده است. چه می‌کنی؟', 'Stuur wordt licht, veel water. Wat doe je?', [['گاز را رها می‌کنم و فرمان را صاف نگه می‌دارم', 'gas los, stuur recht'], ['محکم ترمز می‌کنم', 'hard remmen'], ['تند فرمان می‌دهم', 'hard sturen']], 0, '<b>aquaplaning</b>: گاز را رها کن، آرام بمان تا لاستیک دوباره به جاده برسد.', 'RVV ماده ۱۹', P([I('water')]), 'aquaplaning|aquaplaning'),
+      mc('این تابلو یعنی چه؟', 'Wat betekent dit bord?', [['احتمال یخ یا برف', 'ijzel of sneeuw'], ['کولر', 'airco'], ['منطقهٔ اسکی', 'skigebied']], 0, 'تابلوی <b>J36</b>: ijzel of sneeuw.', 'RVV پیوست ۱ (J36)', P([S('J36')]), 'gladheid|icy road'),
+      mc('این تابلو یعنی چه؟', 'Wat betekent dit bord?', [['جادهٔ لغزنده', 'slipgevaar'], ['جادهٔ پرپیچ', 'bochten'], ['ماشین مست', 'dronken']], 0, 'تابلوی <b>J20</b>: slipgevaar.', 'RVV پیوست ۱ (J20)', P([S('J20')]), 'slipgevaar|slippery road'),
+      mc('این تابلو یعنی چه؟', 'Wat betekent dit bord?', [['باد جانبی', 'zijwind'], ['فرودگاه', 'vliegveld'], ['پرچم', 'vlag']], 0, 'تابلوی <b>J31</b>: zijwind.', 'RVV پیوست ۱ (J31)', P([S('J31')]), 'zijwind|crosswind'),
+      mc('این تابلو یعنی چه؟', 'Wat betekent dit bord?', [['دید بد به‌خاطر برف، باران یا مه', 'slecht zicht'], ['ابری', 'bewolkt'], ['جادهٔ خیس', 'nat']], 0, 'تابلوی <b>J35</b>: slecht zicht door sneeuw, regen of mist.', 'RVV پیوست ۱ (J35)', P([S('J35')]), 'slecht zicht|poor visibility'),
+      mc('کجا اول یخ می‌زند؟', 'Waar wordt het het eerst glad?', [['روی پل‌ها', 'op bruggen'], ['داخل تونل', 'in tunnels'], ['کنار ساختمان‌های گرم', 'bij gebouwen']], 0, 'پل از بالا و پایین سرد می‌شود؛ <b>زودتر یخ</b> می‌زند.', 'RVV ماده ۱۹', P([I('ice'), S('J15', 'brug')]), 'gladheid|ice'),
+      mul('در جادهٔ یخ‌زده چه کارهایی درست است؟', 'Wat doe je bij gladheid?', [['آرام شتاب می‌گیرم', 'rustig optrekken'], ['فاصلهٔ خیلی بیشتر', 'veel meer afstand'], ['آرام ترمز و فرمان', 'rustig remmen en sturen'], ['با سرعت معمول می‌رانم', 'normaal snelheid']], [0, 1, 2], 'همه‌چیز <b>آرام</b> و فاصلهٔ بیشتر.', 'RVV ماده ۱۹', two({ wx: 'snow', units: [{ id: 'you', ln: 1 }] }), 'gladheid|ice'),
+      yn('بیرون شهر در شب کنار جاده روی رایبان ایستاده‌ای. stadslicht و چراغ عقب لازم است؟', 'Buiten de kom ’s nachts stilstaan: stadslicht?', true, 'بله. بیرون شهر در شب روی رایبان stadslicht و چراغ عقب.', 'RVV ماده ۳۸', two({ wx: 'night', units: [{ id: 'you', ln: 1, dx: 12 }] }), 'stadslicht|parking lights'),
+      mc('خورشید پایین روبه‌رویت است و کم می‌بینی. چه می‌کنی؟', 'Laagstaande zon. Wat doe je?', [['آهسته‌تر می‌رانم و آفتاب‌گیر را پایین می‌آورم', 'langzamer, zonneklep'], ['با همان سرعت', 'gewoon door'], ['grootlicht روشن می‌کنم', 'groot licht']], 0, 'دید کم = <b>سرعت کمتر</b>. شیشهٔ تمیز هم مهم است.', 'RVV ماده ۱۹', two({ wx: 'sun', units: [{ id: 'you', ln: 1 }] }), 'laagstaande zon|low sun'),
+      anim('فیلم را ببین. در شب با grootlicht می‌رانی. چه می‌کنی؟', 'Wat doe je?', [['به dimlicht عوض می‌کنم', 'dimmen'], ['grootlicht را روشن نگه می‌دارم', 'groot licht aanhouden'], ['چراغ‌ها را خاموش می‌کنم', 'licht uit']], 0, 'ماشینی از روبه‌رو آمد: <b>dimmen</b> تا او کور نشود.', 'RVV ماده ۳۲ بند ۲ ب', two({ wx: 'night', units: [{ id: 'you', ln: 1, y: 230 }, { id: 'a', ln: 0, y: 70, dn: true, anim: [-60, 0.6, 2] }] }), 'dimmen|dip lights')
+    ]
+  });
+
+  /* ---------------- 4.3 gevaarherkenning ---------------- */
+  L({ id: 'gevaar', ch: 4, fa: 'تشخیص خطر', nl: 'Gevaarherkenning', en: 'Hazard perception',
+    cards: [
+      C('سه جواب ممکن', 'remmen · gas loslaten · niets', 'brake · ease off · nothing',
+        'در سؤال‌های تشخیص خطرِ CBR معمولاً سه انتخاب هست: <b>ترمز</b> (خطر واقعی و نزدیک است)، <b>گاز را رها کن</b> (ممکن است خطر شود، آماده باش)، یا <b>هیچ کاری</b> (همه‌چیز عادی است).', 'CBR · gevaarherkenning',
+        P([I('brake', 'remmen'), I('rpm', 'gas loslaten'), I('check', 'niets')], { cols: 3, h: 200 })),
+      C('دور را نگاه کن', 'ver vooruit kijken', 'look far ahead',
+        'فقط ماشین جلویی را نگاه نکن. <b>دور</b>، کناره‌ها و آینه‌ها را مرتب ببین. هر چه زودتر خطر را ببینی، وقت بیشتری داری.', 'WVW ماده ۵',
+        two({ units: [{ id: 'you', ln: 1 }, { id: 'a', ln: 1, y: 60 }], dist: [[250, 40, 210, 'kijk ver']] })),
+      C('پیش‌بینی کن', 'anticiperen', 'anticipate',
+        'از خودت بپرس: «چه کسی ممکن است الان کار غیرمنتظره کند؟» مثلاً بچه کنار خیابان، در ماشین پارک‌شده، اتوبوس ایستاده، دوچرخه‌سواری که پشت سرش را نگاه می‌کند.', 'WVW ماده ۵',
+        two({ side: 'city', parked: [['r', 110]], units: [{ id: 'you', ln: 1, y: 230 }, { kind: 'kid', ln: 1, x: 214, y: 150 }] })),
+      C('اتوبوس در ایستگاه', 'bus bij de halte', 'bus at a stop',
+        'جلوی اتوبوس ایستاده ممکن است <b>کسی از جلوی آن بدود</b> تا به آن طرف برسد. آهسته رد شو.', 'RVV ماده ۵۲ و ۵۶',
+        two({ side: 'city', units: [{ kind: 'bus', ln: 1, dx: 8, y: 120 }, { id: 'you', ln: 1, y: 240 }, { kind: 'ped', ln: 0, y: 100, color: '#3F9BD6' }] })),
+      C('چراغ ترمز دور', 'remlichten verderop', 'brake lights ahead',
+        'وقتی <b>چند ماشین جلوتر</b> چراغ ترمز می‌زنند، همان موقع پایت را از گاز بردار. منتظر ماشین جلویی خودت نمان.', 'WVW ماده ۵',
+        two({ side: 'hwy', units: [{ id: 'a', ln: 1, y: 50, brake: true }, { id: 'b', ln: 1, y: 120 }, { id: 'you', ln: 1, y: 230 }] })),
+      C('تقاطع بی‌دید', 'onoverzichtelijk kruispunt', 'blind junction',
+        'وقتی ساختمان یا بوته دید تقاطع را می‌گیرد، <b>آهسته</b> نزدیک شو تا بتوانی در فاصله‌ای که می‌بینی بایستی.', 'RVV ماده ۱۹',
+        { buildings: true, units: [{ id: 'you', from: 'S', d: 10 }] }),
+      C('جوان‌ها، سالمندان، حیوانات', 'onvoorspelbare weggebruikers', 'unpredictable road users',
+        'کودکان، سالمندان، دوچرخه‌سوارهایی که با موبایل‌اند، توریست‌ها، اسب و سگ بدون قلاده رفتار غیرقابل پیش‌بینی دارند. فاصله و سرعت را تنظیم کن.', 'WVW ماده ۵',
+        P([I('kid'), I('old'), I('horse'), I('bike')])),
+      C('علامت‌های کوچک', 'kleine signalen', 'small signals',
+        'چرخ‌های ماشین پارک‌شده که می‌چرخند، چراغ عقب یک ماشین که روشن می‌شود، سر دوچرخه‌سوار که به عقب برمی‌گردد، توپ روی خیابان: همهٔ این‌ها <b>هشدار</b> هستند.', 'WVW ماده ۵',
+        P([I('kid', 'bal → kind'), I('car', 'wielen draaien'), I('bike', 'kijkt om')], { cols: 3, h: 200 })),
+      C('خطر را بزرگ نکن', 'niet overdrijven', 'don’t overreact',
+        'ترمز بی‌دلیل هم خطرناک است؛ ماشین پشت سرت ممکن است به تو بزند. اگر فقط «ممکن است» خطر باشد، اغلب <b>رها کردن گاز</b> کافی است.', 'WVW ماده ۵',
+        two({ units: [{ id: 'you', ln: 1, y: 160 }, { id: 'b', ln: 1, y: 240 }] }))
+    ],
+    qs: [
+      anim('فیلم را ببین. با ۵۰ در شهر می‌رانی. چه می‌کنی؟', 'Wat doe je?', [['ترمز می‌کنم', 'remmen'], ['گاز را رها می‌کنم', 'gas loslaten'], ['هیچ کاری', 'niets']], 0, 'بچه از پشت ماشین پارک‌شده بیرون آمد و نزدیک توست: <b>ترمز</b>.', 'RVV ماده ۱۹', two({ side: 'city', parked: [['r', 110], ['r', 170]], units: [{ id: 'you', ln: 1, y: 230, anim: [50, 0, 2.4] }, { kind: 'kid', ln: 1, x: 196, y: 150, anim: [0, 1.6, 0.6] }] }), 'gevaarherkenning|hazard perception'),
+      anim('فیلم را ببین. چه می‌کنی؟', 'Wat doe je?', [['گاز را رها می‌کنم', 'gas loslaten'], ['ترمز می‌کنم', 'remmen'], ['هیچ کاری', 'niets']], 0, 'اتوبوس در ایستگاه است و ممکن است کسی از جلوی آن بیاید؛ هنوز خطر مستقیم نیست: <b>گاز را رها کن</b> و آماده باش.', 'RVV ماده ۵۲', two({ side: 'city', units: [{ kind: 'bus', ln: 1, dx: 8, y: 110 }, { id: 'you', ln: 1, y: 240, anim: [50, 0, 2.4] }] }), 'gevaarherkenning|hazard perception'),
+      anim('فیلم را ببین. در بزرگراه با ۱۰۰ می‌رانی. چه می‌کنی؟', 'Wat doe je?', [['هیچ کاری', 'niets'], ['ترمز می‌کنم', 'remmen'], ['گاز را رها می‌کنم', 'gas loslaten']], 0, 'جاده خالی است و فاصله‌ها خوب؛ دلیلی برای تغییر نیست: <b>هیچ کاری</b>.', 'WVW ماده ۵', rd({ side: 'hwy', L: [{ d: 'up' }, { d: 'up' }], marks: ['dash'], units: [{ id: 'you', ln: 1, y: 230, anim: [40, 0, 2.4] }, { id: 'a', ln: 0, y: 60 }] }), 'gevaarherkenning|hazard perception'),
+      anim('فیلم را ببین. چه می‌کنی؟', 'Wat doe je?', [['ترمز می‌کنم', 'remmen'], ['گاز را رها می‌کنم', 'gas loslaten'], ['هیچ کاری', 'niets']], 0, 'ماشین جلویی ناگهان ترمز شدید زد و فاصله کم است: <b>ترمز</b>.', 'WVW ماده ۵', two({ units: [{ id: 'a', ln: 1, y: 110, brake: true, anim: [0, 1, 0.4] }, { id: 'you', ln: 1, y: 210, anim: [50, 0, 2.2] }] }), 'gevaarherkenning|hazard perception'),
+      anim('فیلم را ببین. چه می‌کنی؟', 'Wat doe je?', [['گاز را رها می‌کنم', 'gas loslaten'], ['ترمز می‌کنم', 'remmen'], ['هیچ کاری', 'niets']], 0, 'دوچرخه‌سوار جلوتر سرش را به عقب برمی‌گرداند؛ شاید بپیچد. هنوز دور است: <b>گاز را رها کن</b>.', 'WVW ماده ۵', two({ units: [{ id: 'b', kind: 'bike', ln: 1, y: 90, dx: 12 }, { id: 'you', ln: 1, y: 240, anim: [50, 0, 2.4] }] }), 'gevaarherkenning|hazard perception'),
+      mc('توپ از بین ماشین‌های پارک‌شده روی خیابان می‌غلتد. بهترین واکنش؟', 'Een bal rolt de straat op.', [['ترمز', 'remmen'], ['گاز را رها کن', 'gas loslaten'], ['هیچ کاری', 'niets']], 0, 'بچه احتمالاً پشت توپ می‌دود و نزدیک توست: <b>ترمز</b>.', 'RVV ماده ۱۹', two({ side: 'city', parked: [['r', 120]], units: [{ id: 'you', ln: 1, y: 220 }] }), 'gevaarherkenning|hazard perception'),
+      mc('خیلی جلوتر در بزرگراه چراغ‌های ترمز روشن می‌شوند. ماشین جلویی هنوز ترمز نکرده. چه می‌کنی؟', 'Verderop remlichten.', [['گاز را رها می‌کنم', 'gas loslaten'], ['شدید ترمز می‌کنم', 'hard remmen'], ['هیچ کاری', 'niets']], 0, 'زود واکنش نشان بده: <b>گاز را رها کن</b> و آمادهٔ ترمز باش.', 'WVW ماده ۵', two({ side: 'hwy', units: [{ id: 'a', ln: 1, y: 50, brake: true }, { id: 'b', ln: 1, y: 120 }, { id: 'you', ln: 1, y: 230 }] }), 'anticiperen|anticipation'),
+      mul('کدام‌ها نشانهٔ خطر احتمالی‌اند؟', 'Welke signalen wijzen op gevaar?', [['چراغ دنده عقب ماشین پارک‌شده', 'achteruitrijlicht'], ['دوچرخه‌سواری که سرش را به عقب برمی‌گرداند', 'fietser kijkt om'], ['توپ روی خیابان', 'bal op straat'], ['جادهٔ خالی و خشک', 'lege droge weg']], [0, 1, 2], 'این علامت‌های کوچک خطرِ نزدیک را نشان می‌دهند.', 'WVW ماده ۵', P([I('car'), I('bike'), I('kid'), I('check')]), 'signalen|signals'),
+      mc('به تقاطعی با دید بد (ساختمان‌ها) نزدیک می‌شوی. چه می‌کنی؟', 'Onoverzichtelijk kruispunt.', [['آهسته‌تر نزدیک می‌شوم', 'langzamer naderen'], ['سرعت را حفظ می‌کنم', 'snelheid houden'], ['بوق می‌زنم و می‌روم', 'toeteren en door']], 0, 'باید بتوانی در فاصله‌ای که می‌بینی بایستی.', 'RVV ماده ۱۹', { buildings: true, units: [{ id: 'you', from: 'S', d: 10 }] }, 'onoverzichtelijk|blind junction'),
+      yn('ترمز شدید «برای اطمینان» وقتی خطری نیست، بی‌خطر است؟', 'Is onnodig hard remmen veilig?', false, 'نه. ماشین پشت سر ممکن است به تو بزند. فقط وقتی لازم است ترمز کن.', 'WVW ماده ۵', two({ units: [{ id: 'you', ln: 1, y: 160 }, { id: 'b', ln: 1, y: 240 }] }), 'remmen|braking'),
+      mc('چرخ‌های جلوی ماشین پارک‌شده کنار خیابان می‌چرخند و دودِ اگزوز دیده می‌شود. چه انتظاری داری؟', 'Geparkeerde auto met draaiende wielen. Wat verwacht je?', [['ممکن است ناگهان راه بیفتد', 'hij kan wegrijden'], ['هیچ', 'niets'], ['خراب است', 'pech']], 0, 'او ممکن است بدون دیدن تو راه بیفتد؛ گاز را رها کن و آماده باش.', 'WVW ماده ۵', two({ side: 'city', parked: [['r', 130]], units: [{ id: 'you', ln: 1, y: 240 }] }), 'anticiperen|anticipation'),
+      anim('فیلم را ببین. در جادهٔ روستایی چه می‌کنی؟', 'Wat doe je?', [['گاز را رها می‌کنم', 'gas loslaten'], ['ترمز می‌کنم', 'remmen'], ['هیچ کاری', 'niets']], 0, 'تراکتوری از راه خاکی سمت راست نزدیک جاده می‌شود؛ باید به تو حق تقدم بدهد، ولی شاید نبیند. <b>گاز را رها کن</b>.', 'RVV ماده ۱۵ بند ۲ الف', two({ side: 'rural', jn: [['r', 90, 0]], units: [{ id: 'you', ln: 1, y: 240, anim: [50, 0, 2.4] }, { kind: 'tractor', x: 240, y: 90, rot: 270, anim: [0, 0.4, 2] }] }), 'gevaarherkenning|hazard perception'),
+      anim('فیلم را ببین. چه می‌کنی؟', 'Wat doe je?', [['ترمز می‌کنم', 'remmen'], ['گاز را رها می‌کنم', 'gas loslaten'], ['هیچ کاری', 'niets']], 0, 'در ماشین پارک‌شده درست جلوی تو باز شد: <b>ترمز</b>.', 'WVW ماده ۵', two({ side: 'city', parked: [['r', 140]], units: [{ id: 'you', ln: 1, y: 230, dx: 6, anim: [50, 0, 2.2] }] , mark: '<rect class="drive" style="--dy:0px;--dl:1.4s;--du:.4s" x="196" y="128" width="16" height="4" fill="#9AA3AB"/>' }), 'gevaarherkenning|hazard perception'),
+      mc('کامیونی جلوی تو در جادهٔ دوطرفه دید جلو را گرفته. سبقت می‌گیری؟', 'Vrachtauto voor je, geen zicht. Inhalen?', [['نه، اول فاصله را بیشتر می‌کنم تا بهتر ببینم', 'eerst afstand en zicht'], ['بله، سریع', 'ja snel']], 0, 'با فاصلهٔ بیشتر <b>بهتر می‌بینی</b>. بدون دید کافی سبقت نگیر.', 'WVW ماده ۵', two({ units: [{ kind: 'truck', ln: 1, y: 130 }, { id: 'you', ln: 1, y: 240 }] }), 'inhalen|overtaking')
+    ]
+  });
+
+  /* ---------------- 4.4 pech en noodsituaties ---------------- */
+  L({ id: 'pech', ch: 4, fa: 'خرابی و وضعیت اضطراری', nl: 'Pech en noodsituaties', en: 'Breakdowns and emergencies',
+    cards: [
+      C('خرابی: اول خودت را امن کن', 'pech: veiligheid eerst', 'breakdown: safety first',
+        'با خرابی تا جای ممکن از جاده <b>بیرون برو</b> (شانه، vluchtstrook، پارکینگ). <b>چراغ خطر</b> روشن کن. بعد خودت و سرنشینان را امن کن.', 'RVV ماده ۴۳ و ۵۸',
+        P([I('hazard', 'alarmlichten'), I('vest', 'hesje'), I('triangle', 'gevarendriehoek')], { cols: 3, h: 200 })),
+      C('مثلث خطر: حدود ۳۰ متر', 'gevarendriehoek ±30 m', 'warning triangle ±30 m',
+        'اگر ماشین ایستاده‌ات مانعی است که دیگران به‌موقع نمی‌بینند، <b>gevarendriehoek</b> را حدود <b>۳۰ متر</b> پشت ماشین در جهت ترافیک بگذار. اگر چراغ خطر روشن است، قانوناً اجباری نیست.', 'RVV ماده ۵۸',
+        two({ units: [{ id: 'you', ln: 1, y: 100 }], dist: [[250, 110, 230, '30 m']], mark: '<path d="M167,226 l10,-18 l10,18z" fill="#fff" stroke="#E53935" stroke-width="3"/>' })),
+      C('در autosnelweg: پشت گاردریل', 'achter de vangrail', 'behind the barrier',
+        'در بزرگراه روی vluchtstrook تا جای ممکن <b>راست</b> بایست، چرخ‌ها را به راست بچرخان، از <b>درِ سمت راست</b> پیاده شو، جلیقهٔ شبرنگ بپوش و <b>پشت گاردریل</b> برو. در بزرگراه مثلث را فقط اگر بی‌خطر است بگذار.', 'RVV ماده ۴۳ بند ۳ و ۵۸',
+        rd({ side: 'hwy', L: [{ d: 'up' }, { d: 'up' }, { d: 'up', t: 'shoulder' }], marks: ['dash', 'solid'], units: [{ id: 'you', ln: 2, dx: 6, y: 130 }, { kind: 'ped', x: 252, y: 170, color: '#F2C200' }] })),
+      C('کمک بگیر', '112 · pechhulp', 'call for help',
+        'در خرابی بدون خطر جانی به <b>امداد خودرو</b> زنگ بزن. اگر کسی آسیب دیده یا خطر جانی هست: <b>۱۱۲</b>. در بزرگراه ستون‌های <b>تلفن اضطراری</b> (تابلوی L16) هم هست.', 'پیوست ۱ (L16)',
+        P([I('phone112', '112'), S('L16', 'noodtelefoon')])),
+      C('بکسل', 'slepen', 'towing',
+        'بکسل با طناب یا میله: فاصله <b>حداکثر ۵ متر</b>. در ماشین بکسل‌شده باید کسی پشت فرمان باشد. با ماشین بکسل‌شده در autosnelweg فقط تا <b>اولین خروجی</b>.', 'RVV ماده ۵۳ و ماده ۶۱b بند ۲ ج',
+        P([I('car'), I('txt:≤ 5 m'), I('car2')], { cols: 3, h: 180 })),
+      C('ترکیدن لاستیک', 'klapband', 'tyre blowout',
+        'فرمان را <b>محکم و صاف</b> نگه دار، گاز را آرام رها کن، <b>ترمز شدید نکن</b> و آهسته کنار جاده برو.', 'WVW ماده ۵',
+        P([I('tyre', 'klapband'), I('wheel', 'stuur recht')])),
+      C('لیز خوردن (slip)', 'slippen', 'skidding',
+        'اگر عقب ماشین سُر خورد: <b>کلاچ بگیر/گاز رها کن</b> و به سمتی که می‌خواهی بروی <b>نگاه کن و فرمان بده</b>. ترمز شدید معمولاً بدترش می‌کند (در ماشین بدون ESP).', 'WVW ماده ۵',
+        P([I('ice', 'slip'), I('wheel', 'tegensturen')])),
+      C('آتش در ماشین', 'brand', 'vehicle fire',
+        'اگر دود یا آتش دیدی: فوراً بایست، موتور را خاموش کن، <b>همه را بیرون ببر</b> و دور شو، ۱۱۲ بزن. کاپوت را کامل باز نکن (اکسیژن آتش را بیشتر می‌کند).', 'WVW ماده ۵',
+        P([I('fire', 'brand'), I('ext', 'blusser'), I('phone112', '112')], { cols: 3, h: 200 })),
+      C('ماشین برقی خراب', 'pech met een elektrische auto', 'EV breakdown',
+        'ماشین برقی خراب را معمولاً <b>نباید با چرخ روی زمین بکسل</b> کرد (موتور ممکن است آسیب ببیند)؛ دفترچهٔ ماشین را ببین و امداد را خبر کن. شارژ را قبل از سفر طولانی برنامه‌ریزی کن.', 'دفترچهٔ سازنده',
+        P([I('plug', 'EV'), I('wrench', 'pechhulp')]))
+    ],
+    qs: [
+      num('gevarendriehoek را تقریباً چند متر پشت ماشین می‌گذاری؟', 'Op hoeveel meter plaats je de gevarendriehoek?', 30, 'حدود <b>۳۰ متر</b> پشت ماشین، در جهت ترافیک.', 'RVV ماده ۵۸ بند ۲', P([I('triangle')]), 'gevarendriehoek|warning triangle'),
+      yn('وقتی چراغ خطر (alarmlichten) روشن است، gevarendriehoek قانوناً اجباری است؟', 'Verplicht driehoek als de alarmlichten aan zijn?', false, 'نه. بند ۳ ماده ۵۸: با <b>چراغ خطر روشن</b> اجباری نیست؛ ولی گذاشتنش اغلب عاقلانه است.', 'RVV ماده ۵۸ بند ۳', P([I('hazard'), I('triangle')]), 'alarmlichten|hazard lights'),
+      ord('خرابی در بزرگراه: ترتیب درست را بچین.', 'Pech op de snelweg: zet in volgorde.', ['1', '2', '3', '4'],
+        'اول <b>به vluchtstrook برو</b>، <b>چراغ خطر</b>، <b>جلیقه و پیاده شدن از راست</b>، بعد <b>پشت گاردریل و تماس</b>.', 'RVV ماده ۴۳ و ۵۸',
+        P([I('phone112', 'پشت گاردریل و تماس', { hot: '4' }), I('lane', 'رفتن به vluchtstrook', { hot: '1' }), I('vest', 'جلیقه و پیاده از راست', { hot: '3' }), I('hazard', 'چراغ خطر', { hot: '2' })]), 'pech|breakdown'),
+      mc('در بزرگراه خراب شدی و روی vluchtstrook ایستادی. کجا منتظر امداد می‌مانی؟', 'Waar wacht je op hulp?', [['پشت گاردریل', 'achter de vangrail'], ['داخل ماشین', 'in de auto'], ['کنار ماشین روی vluchtstrook', 'naast de auto']], 0, 'ماشین‌ها گاهی به ماشینِ ایستاده می‌زنند. <b>پشت گاردریل</b> امن‌ترین جاست.', 'WVW ماده ۵', rd({ side: 'hwy', L: [{ d: 'up' }, { d: 'up' }, { d: 'up', t: 'shoulder' }], marks: ['dash', 'solid'], units: [{ id: 'you', ln: 2, dx: 6, y: 130 }] }), 'vangrail|crash barrier'),
+      mc('از کدام در پیاده می‌شوی وقتی روی vluchtstrook ایستاده‌ای؟', 'Welke deur gebruik je op de vluchtstrook?', [['درِ سمت راست', 'rechterdeur'], ['درِ سمت چپ', 'linkerdeur'], ['فرقی ندارد', 'maakt niet uit']], 0, 'سمت چپ ترافیک سریع است؛ از <b>راست</b> پیاده شو.', 'WVW ماده ۵', P([I('car', 'rechts uitstappen')]), 'uitstappen|getting out'),
+      mc('لاستیک جلوی ماشین در ۱۰۰ km/h می‌ترکد. چه می‌کنی؟', 'Klapband bij 100 km/h. Wat doe je?', [['فرمان را محکم صاف نگه می‌دارم و آرام سرعت کم می‌کنم', 'stuur vast, rustig afremmen'], ['شدید ترمز می‌کنم', 'hard remmen'], ['تند به راست می‌پیچم', 'scherp naar rechts']], 0, 'ترمز شدید یا فرمان تند ماشین را از کنترل خارج می‌کند.', 'WVW ماده ۵', P([I('tyre')]), 'klapband|blowout'),
+      num('حداکثر فاصلهٔ بین دو ماشین هنگام بکسل (متر)؟', 'Maximale afstand bij slepen (meter)?', 5, '<b>۵ متر</b>.', 'RVV ماده ۵۳', P([I('car'), I('car2')]), 'slepen|towing'),
+      yn('در ماشین بکسل‌شده باید کسی پشت فرمان بنشیند؟', 'Moet iemand in de gesleepte auto sturen?', true, 'بله. ماشین بکسل‌شده باید راننده داشته باشد تا فرمان و ترمز کند.', 'RVV ماده ۶۱b بند ۲ ج', P([I('car2', 'bestuurder')]), 'slepen|towing'),
+      mc('از زیر کاپوت دود بیرون می‌آید. اولین کار؟', 'Rook onder de motorkap. Eerste actie?', [['می‌ایستم، موتور را خاموش می‌کنم و همه را بیرون می‌برم', 'stoppen, motor uit, iedereen eruit'], ['کاپوت را کامل باز می‌کنم', 'motorkap open'], ['تا خانه می‌رانم', 'naar huis rijden']], 0, 'جان آدم‌ها اول؛ بعد ۱۱۲.', 'WVW ماده ۵', P([I('fire'), I('phone112')]), 'brand|fire'),
+      mc('شماره تلفن اضطراری در هلند و اروپا؟', 'Alarmnummer in Nederland?', [['۱۱۲', '112'], ['۹۱۱', '911'], ['۱۱۵', '115']], 0, '<b>۱۱۲</b> برای پلیس، آتش‌نشانی و آمبولانس در همهٔ اروپا.', 'alarmnummer', P([I('phone112')]), '112|emergency number'),
+      mc('این تابلو یعنی چه؟', 'Wat betekent dit bord?', [['تلفن اضطراری', 'noodtelefoon'], ['کیوسک تلفن عمومی', 'telefooncel'], ['پلیس', 'politie']], 0, 'تابلوی <b>L16</b>: noodtelefoon.', 'RVV پیوست ۱ (L16)', P([S('L16')]), 'noodtelefoon|emergency phone'),
+      mc('عقب ماشین روی جادهٔ لیز به چپ سُر می‌خورد. چه می‌کنی؟', 'Achterkant slipt naar links. Wat doe je?', [['گاز را رها می‌کنم و به سمتی که می‌خواهم بروم نگاه و فرمان می‌دهم', 'gas los, kijken en sturen waar je heen wilt'], ['محکم ترمز می‌کنم', 'hard remmen'], ['گاز می‌دهم', 'gas geven']], 0, 'نگاه و فرمان به سمت مسیر درست (tegensturen)؛ ترمز شدید نکن.', 'WVW ماده ۵', P([I('ice')]), 'slippen|skidding'),
+      mul('در کیت ماشین چه چیزهایی مفید است؟', 'Wat is nuttig in de auto?', [['جلیقهٔ شبرنگ', 'veiligheidshesje'], ['مثلث خطر', 'gevarendriehoek'], ['جعبهٔ کمک‌های اولیه', 'verbandtrommel'], ['چراغ مه‌شکن اضافه', 'extra mistlamp']], [0, 1, 2], 'جلیقه، مثلث و جعبهٔ کمک‌های اولیه. (در هلند حمل آن‌ها برای خودروی سواری قانوناً اجباری نیست، ولی خیلی توصیه می‌شود.)', 'توصیه · ANWB/Rijkswaterstaat', P([I('vest'), I('triangle'), I('first'), I('fogr')]), 'pechuitrusting|breakdown kit'),
+      yn('خرابی در تونل: ماشین را تا جای ممکن به vluchthaven یا خروجی می‌بری؟', 'Pech in een tunnel: naar een vluchthaven?', true, 'بله؛ اگر نمی‌شود، چراغ خطر بزن، موتور را خاموش کن و از راهنمای اضطراری تونل استفاده کن.', 'RVV ماده ۲۳ و ۴۳', rd({ side: 'hwy', L: [{ d: 'up' }, { d: 'up' }], marks: ['dash'], tunnel: 300, units: [{ id: 'you', ln: 1 }] }), 'tunnel|tunnel'),
+      yn('ماشین برقی خراب را همیشه می‌شود با طناب و چرخ روی زمین بکسل کرد؟', 'Elektrische auto altijd slepen met wielen op de grond?', false, 'نه. خیلی ماشین‌های برقی نباید این‌طور بکسل شوند؛ دفترچه را ببین.', 'دفترچهٔ سازنده', P([I('plug')]), 'elektrische auto|electric car')
+    ]
+  });
+})();

@@ -99,7 +99,7 @@
     });
     if (sp.hots) sp.hots.forEach(function (h) { o += '<g data-hot="' + h[0] + '" class="hot"><circle cx="' + h[1] + '" cy="' + h[2] + '" r="15" fill="#fff" fill-opacity=".9" stroke="#3F9BD6" stroke-width="3"/>' + T(h[1], h[2] + 5, h[3] || h[0], { fs: 13, c: '#3F9BD6' }) + '<text class="ord" x="' + (h[1] + 12) + '" y="' + (h[2] - 10) + '" font-size="12" font-weight="900" fill="#fff" text-anchor="middle"></text></g>'; });
     if (sp.wx) o += wx(sp.wx);
-    return o + note(sp);
+    return o + (sp.mark || '') + note(sp);
   }
   function mx(g, cx, cy) { // matrix sign content
     if (g === 'x') return '<g stroke="#FF2A2A" stroke-width="4" stroke-linecap="round"><line x1="' + (cx - 9) + '" y1="' + (cy - 9) + '" x2="' + (cx + 9) + '" y2="' + (cy + 9) + '"/><line x1="' + (cx + 9) + '" y1="' + (cy - 9) + '" x2="' + (cx - 9) + '" y2="' + (cy + 9) + '"/></g>';

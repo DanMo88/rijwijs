@@ -18,7 +18,7 @@ D.chapters.forEach(ch => ch.lessons.forEach(lid => {
     const hots = (svg.match(/data-hot="([^"]+)"/g) || []).map(m => m.slice(10, -1));
     if (q.type === 'mc' || q.type === 'anim') chk(q.o && q.o.length >= 2 && q.a >= 0 && q.a < q.o.length, id + ' bad mc');
     if (q.type === 'yn') chk(q.a === 0 || q.a === 1, id + ' bad yn');
-    if (q.type === 'num') chk(typeof q.a === 'number', id + ' bad num');
+    if (q.type === 'num') chk(Number.isInteger(q.a) && q.a >= 0 && q.a < 10000, id + ' bad num');
     if (q.type === 'multi') chk(Array.isArray(q.a) && q.a.length >= 1 && q.a.every(k => k < q.o.length), id + ' bad multi');
     if (q.type === 'hot') chk(hots.includes(q.a) && hots.length >= 2, id + ' hot target missing ' + q.a + ' in [' + hots + ']');
     if (q.type === 'order') chk(Array.isArray(q.a) && q.a.every(a => hots.includes(a)) && q.a.length === hots.length, id + ' order ids ' + q.a + ' vs ' + hots);
