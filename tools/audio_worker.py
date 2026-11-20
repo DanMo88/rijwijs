@@ -24,8 +24,10 @@ def score(f, text):
     segs, _ = whisper().transcribe(load(f), language="fa", beam_size=3)
     hyp = " ".join(s.text for s in segs)
     return difflib.SequenceMatcher(None, norm(text), norm(hyp)).ratio(), hyp
-def tts(text, out):
+def tts(text, out, batch=0):
     tf = tempfile.NamedTemporaryFile('w', delete=False, suffix='.txt'); tf.write(text); tf.close()
+    if batch: os.environ['RW_TTS_BATCH'] = str(batch)
+    else: os.environ.pop('RW_TTS_BATCH', None)
     for attempt in range(6):
         p = subprocess.run([sys.executable, 'tools/gemini_tts.py', tf.name, out], capture_output=True, text=True)
         if p.returncode == 0: os.unlink(tf.name); return 'ok'
@@ -39,10 +41,51 @@ def write_index():
     idx = {k: v['v'] for k, v in sorted(man.items()) if os.path.exists('audio/%s.mp3' % k)}
     open('js/data/audio-index.js', 'w').write('/* cards with narration (Gemini TTS, voice Sulafat); value = cache version */\nwindow.RW_AUDIO = ' + json.dumps(idx, separators=(',', ':')) + ';\n')
     json.dump(man, open(MAN, 'w'), ensure_ascii=False, indent=0)
+def silences(f):
+    err = subprocess.run(["ffmpeg", "-hide_banner", "-i", f, "-af", "silencedetect=n=-42dB:d=0.6", "-f", "null", "-"], capture_output=True, text=True).stderr
+    st = [float(x) for x in re.findall(r'silence_start: ([\d.]+)', err)]; en = [float(x) for x in re.findall(r'silence_end: ([\d.]+)', err)]
+    return [(a, b) for a, b in zip(st, en)]
+def split(f, n, outs):
+    gaps = sorted(silences(f), key=lambda g: g[1] - g[0], reverse=True)[:n - 1]
+    if len(gaps) < n - 1: return False
+    cuts = [0.0] + [(a + b) / 2 for a, b in sorted(gaps)] + [None]
+    af = "silenceremove=start_periods=1:start_threshold=-45dB:start_silence=0.03,areverse,silenceremove=start_periods=1:start_threshold=-45dB:start_silence=0.08,areverse"
+    for i, o in enumerate(outs):
+        args = ["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-i", f, "-ss", str(cuts[i])] + (["-to", str(cuts[i + 1])] if cuts[i + 1] else []) + ["-af", af, "-ac", "1", "-ar", "24000", "-c:a", "libmp3lame", "-b:a", "48k", o]
+        subprocess.run(args, check=True)
+    return True
+BATCH = int(os.environ.get('RW_BATCH', '5'))
 cards = json.loads(subprocess.run(['node', 'tools/dump_cards.js'], capture_output=True, text=True, check=True).stdout)
 todo = [c for c in cards if man.get(c['aid'], {}).get('h') != hashlib.md5(c['text'].encode()).hexdigest() or not os.path.exists('audio/%s.mp3' % c['aid'])]
 print(len(cards), 'cards,', len(todo), 'to narrate', flush=True)
 done = 0; stop = None; last = 0
+def accept(c, f, sc):
+    global done
+    os.replace(f, 'audio/%s.mp3' % c['aid'])
+    man[c['aid']] = {'h': hashlib.md5(c['text'].encode()).hexdigest(), 'v': VER, 'sim': round(sc, 2)}
+    done += 1; write_index()
+if BATCH > 1:
+    i = 0; redo = []
+    while i < len(todo) and done < LIMIT and not stop:
+        grp = []; chars = 0
+        while i < len(todo) and len(grp) < BATCH and chars + len(todo[i]['text']) < 3200: grp.append(todo[i]); chars += len(todo[i]['text']); i += 1
+        if len(grp) == 1: redo += grp; continue
+        wait = 7.5 - (time.time() - last)
+        if wait > 0: time.sleep(wait)
+        last = time.time(); big = 'audio/_batch.mp3'
+        text = '\n\n'.join('%d) %s' % (k + 1, g['text']) for k, g in enumerate(grp))
+        r = tts(text, big, batch=len(grp))
+        if r != 'ok': stop = r; i -= len(grp); break
+        outs = ['audio/_seg%d.mp3' % k for k in range(len(grp))]
+        if not split(big, len(grp), outs): print('split failed', [g['aid'] for g in grp], flush=True); redo += grp; continue
+        for g, o in zip(grp, outs):
+            sc, hyp = score(o, re.sub(r'^\d+\)\s*', '', g['text']))
+            print('%s batch sim=%.2f' % (g['aid'], sc), flush=True)
+            if sc >= 0.62: accept(g, o, sc)
+            else: redo.append(g); os.remove(o)
+        os.path.exists(big) and os.remove(big)
+    todo = redo + todo[i:] if not stop else todo[i:]
+    print('batch phase done', done, 'left', len(todo), flush=True)
 for c in todo:
     if done >= LIMIT: break
     out = 'audio/%s.mp3' % c['aid']; best = None

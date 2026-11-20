@@ -1,6 +1,8 @@
 import os, sys, json, base64, subprocess, urllib.request, urllib.error
 # usage: gen.py <textfile> <out.mp3>
 text = open(sys.argv[1]).read().strip(); out = sys.argv[2]
+nb = int(os.environ.get("RW_TTS_BATCH", "0") or 0)
+if nb: text = "Read these " + str(nb) + " numbered Persian paragraphs one after another. Do not read the numbers. After each paragraph, stay completely silent for two full seconds before the next one.\n\n" + text
 prompt = "Read the following Persian (Farsi) text aloud in natural, warm, soft and calm Persian, like a professional Iranian audiobook narrator with a standard Tehrani accent. Speak clearly at a relaxed pace. Pronounce any Dutch words written in Latin letters the Dutch way:\n\n" + text
 body = {"contents":[{"parts":[{"text":prompt}]}],"generationConfig":{"responseModalities":["AUDIO"],
   "speechConfig":{"voiceConfig":{"prebuiltVoiceConfig":{"voiceName":"Sulafat"}}}}}
