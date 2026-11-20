@@ -86,7 +86,9 @@ img { max-width: 100%; display: block; }
 /* card with scene */
 .qcard { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; padding: 8px 10px; gap: clamp(4px, .9dvh, 8px); overflow: hidden; }
 .qtop { flex: none; display: flex; align-items: center; gap: 6px; }
-.qtop .ref { margin-inline-start: auto; }
+.qtop .ref { margin-inline-start: auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.qtop { min-width: 0; }
+.qtop .fmt { flex-shrink: 0; }
 .fmt { font-size: .7rem; font-weight: 700; color: var(--blue); background: #E9F4FC; border-radius: 99px; padding: 1px 9px; white-space: nowrap; }
 .fmt .en { font-family: Fredoka, var(--fa); }
 .ref { font-size: .7rem; font-weight: 700; color: var(--purple); background: #F3ECFB; border-radius: 99px; padding: 1px 9px; white-space: nowrap; }
