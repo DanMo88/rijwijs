@@ -302,7 +302,7 @@
   function icon(name) {
     if (!name) return '';
     if (/^sp:/.test(name)) return speedo(name.slice(3));
-    if (/^txt:/.test(name)) { var s = name.slice(4); return '<rect x="6" y="20" width="88" height="60" rx="14" fill="#FFF1EA" stroke="#E8734A" stroke-width="3"/>' + T(50, 60, s, { fs: s.length > 6 ? 16 : 26, c: '#E8734A', ff: 'Fredoka, Vazirmatn, Arial' }); }
+    if (/^txt:/.test(name)) { var s = name.slice(4); return '<rect x="6" y="20" width="88" height="60" rx="14" fill="#FFF1EA" stroke="#E8734A" stroke-width="3"/>' + T(50, 60, s, { fs: s.length > 6 ? 16 : 26, c: '#E8734A', ff: 'Fredoka, Vazirmatn, Arial' }).replace('<text ', '<text direction="ltr" unicode-bidi="embed" '); }
     if (/^sg:/.test(name)) return '<image href="signs/' + name.slice(3) + '.svg" x="6" y="6" width="88" height="88"/>';
     return (IC[name] || IC.info)();
   }
