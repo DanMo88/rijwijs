@@ -15,7 +15,7 @@
   const header = (title, o = {}) => `<header class="page-h"><div class="row">${o.back ? `<button class="back" data-go="${o.back}" aria-label="بازگشت">→</button>` : ''}<h1>${title}</h1>${o.right || ''}</div>${rule}${o.sub ? `<p class="subt">${o.sub}</p>` : ''}</header>`;
   const prog = (i, n, extra = '') => `<div class="prog"><span>${fd(i + 1)} از ${fd(n)}</span><span class="bar"><i style="width:${Math.round((i + 1) / n * 100)}%"></i></span>${extra}</div>`;
   const bindGo = () => $app.querySelectorAll('[data-go]').forEach(b => b.onclick = () => go(b.dataset.go));
-  const FMT = { mc: ['چندگزینه‌ای', 'Meerkeuze'], yn: ['بله / خیر', 'Ja / Nee'], num: ['عدد بنویس', 'Invulvraag'], hot: ['روی تصویر بزن', 'Hotspot'], order: ['ترتیب', 'Sleepvraag'], multi: ['چند جواب درست', 'Multiple response'], hazard: ['تشخیص خطر · انیمیشن', 'Gevaarherkenning'] };
+  const FMT = { mc: ['چندگزینه‌ای', 'Meerkeuze'], yn: ['بله / خیر', 'Ja / Nee'], num: ['عدد بنویس', 'Invulvraag'], hot: ['روی تصویر بزن', 'Hotspot'], order: ['ترتیب', 'Sleepvraag'], multi: ['چند جواب درست', 'Multiple response'], anim: ['فیلم کوتاه', 'Animatievraag'] };
   const mistakes = () => D.questions.filter(q => S.qs[q.id] && S.qs[q.id].box === 0);
   const readMs = html => Math.min(13000, Math.max(5000, 2600 + html.replace(/<[^>]+>/g, '').length * 55));
   function autoBar(el, ms, done) { // tap-to-pause progress bar that fires done() once
@@ -145,21 +145,20 @@
     const optHtml = (o, k) => `<button class="opt" data-k="${k}"><span class="k">${'ABCD'[k]}</span><span class="l"><b>${o.fa}</b><small>${o.nl}</small></span></button>`;
     const markOpts = (pick, good) => ans.querySelectorAll('.opt').forEach(b => { const k = +b.dataset.k; if (good.includes(k)) b.classList.add('ok'); else if (pick.includes(k)) b.classList.add('bad'); b.disabled = true; });
 
-    if (q.type === 'mc' || q.type === 'yn' || q.type === 'hazard') {
+    if (q.type === 'mc' || q.type === 'yn' || q.type === 'anim') {
       const opts = q.type === 'yn' ? [{ fa: 'بله', nl: 'Ja' }, { fa: 'نه', nl: 'Nee' }] : q.o;
       const draw = () => {
         ans.innerHTML = `<div class="answers ${opts.length === 2 && q.type !== 'mc' ? 'two' : ''}">${opts.map(optHtml).join('')}</div>`;
         ans.querySelectorAll('.opt').forEach(b => b.onclick = () => { const k = +b.dataset.k; if (!exam) markOpts([k], [q.a]); else b.classList.add('on'); finish(k === q.a); });
       };
-      if (q.type === 'hazard') {
-        document.getElementById('qt').innerHTML = '<div class="fa">👀 خوب نگاه کن…</div><div class="nlq">Kijk goed…</div>';
+      if (q.type === 'anim') { // silent animation plays once, then an ordinary question
+        const qt = document.getElementById('qt');
+        qt.innerHTML = '<div class="fa">🎬 فیلم را نگاه کن…</div><div class="nlq">Kijk naar de animatie…</div>';
         later(() => {
           stage.querySelectorAll('[style*="display:none"]').forEach(g => g.style.display = '');
-          document.getElementById('qt').innerHTML = `<div class="fa">${q.q}</div><div class="nlq">${q.nl}</div>`;
+          qt.innerHTML = `<div class="fa">${q.q}</div><div class="nlq">${q.nl}</div>` + (q.terms ? `<div class="tchips"><span class="tchip">NL · ${q.terms.nl}</span><span class="tchip e">EN · ${q.terms.en}</span></div>` : '');
           draw();
-          const ab = document.getElementById('ab'); ab.hidden = false;
-          autoBar(ab, 8000, () => { if (!locked) { toast('⏰ دیر شد!'); if (!exam) markOpts([], [q.a]); finish(false); } });
-        }, 3600);
+        }, 3700);
       } else draw();
     }
     if (q.type === 'multi') {
@@ -200,7 +199,7 @@
   function rightAns(q) {
     const lab = id => { const u = (q.s.units || []).find(x => x.hot === id || x.id === id); return id === 'you' ? 'تو' : (u && u.label) || id; };
     if (q.type === 'yn') return q.a === 0 ? 'بله (Ja)' : 'نه (Nee)';
-    if (q.type === 'mc' || q.type === 'hazard') return 'ABCD'[q.a] + ' · ' + q.o[q.a].fa + ' (' + q.o[q.a].nl + ')';
+    if (q.type === 'mc' || q.type === 'anim') return 'ABCD'[q.a] + ' · ' + q.o[q.a].fa + ' (' + q.o[q.a].nl + ')';
     if (q.type === 'multi') return q.a.map(k => 'ABCD'[k]).join(' و ');
     if (q.type === 'num') return fd(q.a);
     if (q.type === 'order') return q.a.map(lab).join(' ← ');

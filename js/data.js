@@ -120,9 +120,10 @@ window.RW = {
     { id: 17, type: 'yn', q: 'چراغ تو سبز است ولی بعد از تقاطع جا نیست. وارد تقاطع می‌شوی؟', nl: 'Mag je het kruispunt oprijden?',
       a: 1, e: 'نه. نباید تقاطع را مسدود کنی. حتی با چراغ سبز هم پشت خط صبر کن تا بعد از تقاطع جا باز شود.', ref: 'RVV ماده ۱۴',
       s: { lights: [['S', 'green']], units: [{ id: 'you', from: 'S', d: 8 }, { id: 'c', from: 'S', at: [167, 18], color: '#4B5563' }, { id: 'c', from: 'S', at: [167, 60], color: '#4B5563' }, { id: 'c', from: 'S', at: [167, 97], color: '#4B5563' }] } },
-    { id: 18, type: 'hazard', q: 'با ۵۰ کیلومتر در ساعت می‌رانی. چه می‌کنی؟', nl: 'Je rijdt 50 km/h. Wat doe je?',
-      o: [{ fa: 'ترمز', nl: 'Remmen' }, { fa: 'برداشتن پا از گاز', nl: 'Gas loslaten' }, { fa: 'هیچ کاری', nl: 'Niets' }], a: 0,
-      e: 'دوچرخه‌سوار از پشت ساختمان، از سمت راست تو، وارد تقاطع هم‌ارز می‌شود و حق تقدم دارد. چون فاصله کم است، باید ترمز کنی. همیشه باید بتوانی در مسافتی که جلوی تو دیده می‌شود بایستی.', ref: 'RVV ماده ۱۵ بند ۱ و ماده ۱۹',
+    { id: 18, type: 'anim', q: 'فیلم را دیدی. حالا چه می‌کنی؟', nl: 'Wat doe je?',
+      terms: { nl: 'gevaarherkenning · voorrang verlenen', en: 'hazard perception · give priority' },
+      o: [{ fa: 'می‌گذارم دوچرخه‌سوار اول برود', nl: 'Ik laat de fietser voorgaan' }, { fa: 'بوق می‌زنم و ادامه می‌دهم', nl: 'Ik toeter en rijd door' }, { fa: 'ادامه می‌دهم، چون جاده من پهن‌تر است', nl: 'Ik rijd door, mijn weg is breder' }], a: 0,
+      e: 'دوچرخه‌سوار از پشت ساختمان، از سمت راست تو، وارد تقاطع هم‌ارز می‌شود. او حق تقدم دارد، پس سرعت کم کن و بگذار اول برود. پهن‌تر بودن جاده حق تقدم نمی‌دهد. وقتی دید کم است، باید بتوانی در مسافتی که جلوی تو دیده می‌شود بایستی.', ref: 'RVV ماده ۱۵ بند ۱ و ماده ۱۹',
       s: { buildings: true, noArrows: true, note: '50 km/h', units: [{ id: 'you', from: 'S', d: 4, anim: [70, 0, 3.2] }, { id: 'b', kind: 'bike', label: 'B', from: 'E', d: -2, anim: [60, 2.0, 1.4] }] } }
   ]
 };

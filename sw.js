@@ -1,6 +1,6 @@
-// Rijwijs service worker v1 · HTML network-first · assets stale-while-revalidate
-const V = 'rijwijs-v1';
-const SHELL = ['./', 'index.html', 'css/styles.css?v=1', 'js/app.js?v=1', 'js/data.js?v=1', 'js/diagram.js?v=1', 'js/install.js?v=1', 'manifest.webmanifest',
+// Rijwijs service worker v2 · HTML network-first · assets stale-while-revalidate
+const V = 'rijwijs-v2';
+const SHELL = ['./', 'index.html', 'css/styles.css?v=2', 'js/app.js?v=2', 'js/data.js?v=2', 'js/diagram.js?v=2', 'js/install.js?v=2', 'manifest.webmanifest',
   'fonts/Vazirmatn-Regular.woff2', 'fonts/Vazirmatn-Bold.woff2', 'fonts/Vazirmatn-Black.woff2', 'fonts/Fredoka-Bold.woff2',
   'icons/icon-192.png', 'icons/icon-512.png', 'images/shir-o-khorshid.svg', 'images/nl.svg',
   'signs/B1.svg', 'signs/B2.svg', 'signs/B3.svg', 'signs/B4.svg', 'signs/B5.svg', 'signs/B6.svg', 'signs/B7.svg', 'signs/D1.svg', 'signs/J8.svg'];
