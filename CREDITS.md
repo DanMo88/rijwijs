@@ -7,3 +7,4 @@
 - Fonts: Vazirmatn (SIL OFL 1.1), Fredoka (SIL OFL 1.1).
 - Traffic scene diagrams: drawn in code (js/diagram.js) for this app.
 - Law text: wetten.overheid.nl, Reglement verkeersregels en verkeerstekens 1990 (BWBR0004825).
+- Theory-card narration (audio/t01–t11.mp3): Microsoft Edge neural TTS voice fa-IR-DilaraNeural via edge-tts, scripts in tools/narration.json, silence-trimmed with ffmpeg (tools/trim.py).

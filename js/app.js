@@ -7,7 +7,7 @@
   const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} };
   let tok = 0, timers = [];
   const later = (f, ms) => { const t = tok, h = setTimeout(() => { if (t === tok) f(); }, ms); timers.push(h); return h; };
-  function reset() { tok++; timers.forEach(clearTimeout); timers = []; }
+  function reset() { tok++; timers.forEach(clearTimeout); timers = []; if (window.RA) RA.stop(); }
   function toast(m) { const t = document.getElementById('toast'); t.textContent = m; t.classList.add('on'); clearTimeout(toast.h); toast.h = setTimeout(() => t.classList.remove('on'), 2200); }
   const go = h => { if (location.hash === h) route(); else location.hash = h; };
   const rule = '<div class="rule"><i></i><i></i><i></i><i></i></div>';
@@ -86,11 +86,30 @@
       </main>`;
     bindGo();
     const nextF = () => i + 1 < T.length ? go('#/t/' + (i + 1)) : (toast('حالا تمرین! ✍️'), go('#/q/practice/0'));
-    const toggle = autoBar(document.getElementById('ab'), readMs(c.x + c.t) + 1500, nextF);
+    const ab = document.getElementById('ab'), t0 = tok;
+    let toggle = () => {};
+    // narration: title + text read aloud, then 2 s after the last word → next card. Fallback: reading-time timer.
+    const fallback = () => { if (t0 === tok) toggle = autoBar(ab, readMs(c.x + c.t) + 1500, nextF); };
+    if (window.RA) {
+      let paused = false, gap = null, gapLeft = 0, gapAt = 0, ended = false;
+      const armGap = ms => { gapAt = Date.now(); gapLeft = ms; gap = later(() => { if (!paused) nextF(); }, ms); };
+      RA.play('t' + String(i + 1).padStart(2, '0'), () => { if (t0 !== tok) return; ended = true; if (!paused) armGap(2000); })
+        .then(dur => {
+          if (t0 !== tok) return RA.stop();
+          if (i + 1 < T.length) RA.load('t' + String(i + 2).padStart(2, '0')).catch(() => {});
+          ab.style.setProperty('--t', (dur * 1000 + 2000) + 'ms'); ab.classList.add('run'); ab.classList.add('voice');
+          toggle = () => {
+            if (t0 !== tok) return; paused = !paused; ab.classList.toggle('paused', paused); RA.pause(paused);
+            if (ended) { if (paused) { clearTimeout(gap); gapLeft = Math.max(0, gapLeft - (Date.now() - gapAt)); } else armGap(Math.max(300, gapLeft)); }
+            toast(paused ? '⏸ مکث شد؛ برای ادامه دوباره بزن' : '▶ ادامه');
+          };
+        })
+        .catch(fallback);
+    } else fallback();
     document.getElementById('next').onclick = nextF;
     document.getElementById('prev').onclick = () => go(i ? '#/t/' + (i - 1) : '#/l/vk');
-    document.getElementById('pause').onclick = toggle;
-    $app.querySelector('.qcard').onclick = toggle;
+    document.getElementById('pause').onclick = () => toggle();
+    $app.querySelector('.qcard').onclick = () => toggle();
     swipe($app.querySelector('.qcard'), () => nextF(), () => go(i ? '#/t/' + (i - 1) : '#/l/vk'));
   }
   function swipe(el, left, right) { let x0 = null; el.addEventListener('touchstart', e => { x0 = e.touches[0].clientX; }, { passive: true }); el.addEventListener('touchend', e => { if (x0 == null) return; const dx = e.changedTouches[0].clientX - x0; x0 = null; if (Math.abs(dx) > 60) (dx > 0 ? left : right)(); }); }
