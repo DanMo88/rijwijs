@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Narrates every theory card that has no (or outdated) audio with Gemini TTS, voice Sulafat.
+"""Usage: audio_worker.py <cache-version> [limit]   |   audio_worker.py check   (free Whisper self-test)
+Narrates every theory card that has no (or outdated) audio with Gemini TTS, voice Sulafat.
 Key from env GEMINI_API_KEY (never stored). Paces ~8 requests/min, sleeps on 429, stops on a daily cap.
 Each clip is checked with Whisper (faster-whisper large-v3-turbo); a clip that does not match is redone once.
 Writes audio/<aid>.mp3, js/data/audio-index.js, tools/audio-manifest.json and tools/audio-missing.txt."""
@@ -7,36 +8,62 @@ import json, os, re, subprocess, sys, time, hashlib, difflib, tempfile
 import numpy as np
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__))); os.chdir(ROOT)
 MAN = 'tools/audio-manifest.json'; man = json.load(open(MAN)) if os.path.exists(MAN) else {}
-VER = int(sys.argv[1]) if len(sys.argv) > 1 else 6
+VER = int(sys.argv[1]) if len(sys.argv) > 1 and sys.argv[1].isdigit() else 6
 LIMIT = int(sys.argv[2]) if len(sys.argv) > 2 else 10**6
 _m = None
 def whisper():
     global _m
     if _m is None:
         from faster_whisper import WhisperModel
-        _m = WhisperModel("large-v3-turbo", device="cpu", compute_type="int8", cpu_threads=4)
+        # float32 on purpose: int8 / int8_float32 kernels return multilingual garbage on this box's CPU
+        # (found 2026-11-21: every clip scored ~0). Override with RW_WHISPER_CT only after re-checking the good clips.
+        _m = WhisperModel("large-v3-turbo", device="cpu", compute_type=os.environ.get('RW_WHISPER_CT', 'float32'), cpu_threads=4)
     return _m
 def load(f):
     b = subprocess.run(["ffmpeg", "-v", "error", "-i", f, "-f", "s16le", "-ac", "1", "-ar", "16000", "-"], capture_output=True).stdout
     return np.frombuffer(b, np.int16).astype(np.float32) / 32768
-def norm(s): return re.sub(r'[^\u0600-\u06FF]', '', s.replace('ي', 'ی').replace('ك', 'ک').replace('\u200c', ''))
+FA_DIG = str.maketrans('۰۱۲۳۴۵۶۷۸۹٠١٢٣٤٥٦٧٨٩', '01234567890123456789')
+def words(s):
+    """Persian words only: unify ي/ك/ة/ۀ, drop ZWNJ, diacritics and tatweel, Persian digits -> ASCII.
+    Latin text (the Dutch terms) is dropped on both sides: Whisper writes Dutch words in Persian script."""
+    s = s.translate(FA_DIG).replace('ي', 'ی').replace('ى', 'ی').replace('ك', 'ک').replace('ة', 'ه').replace('ۀ', 'ه').replace('أ', 'ا').replace('إ', 'ا').replace('آ', 'ا')
+    s = re.sub(r'[\u064B-\u065F\u0670\u0640]', '', s).replace('\u200c', '').replace('\u200f', '')
+    return re.findall(r'[\u0621-\u063A\u0641-\u064A\u067E\u0686\u0698\u06A9\u06AF\u06CC0-9]+', s)
+def ref_text(text):
+    """What we compare against: the card text without the spoken Dutch part ('به هلندی: …' up to the next period)."""
+    return re.sub(r'به هلندی:[^.]*\.', ' ', text)
 def score(f, text):
-    segs, _ = whisper().transcribe(load(f), language="fa", beam_size=3)
+    segs, _ = whisper().transcribe(load(f), language="fa", beam_size=3, condition_on_previous_text=False)
     hyp = " ".join(s.text for s in segs)
-    return difflib.SequenceMatcher(None, norm(text), norm(hyp)).ratio(), hyp
+    r, h = words(ref_text(text)), words(hyp)
+    if not r: return 1.0, hyp
+    sm = difflib.SequenceMatcher(None, r, h, autojunk=False)
+    cov = sum(b.size for b in sm.get_matching_blocks()) / len(r)            # share of reference words heard, in order
+    chars = difflib.SequenceMatcher(None, ''.join(r), ''.join(h), autojunk=False).ratio()  # tolerant to spelling (ق/غ, ت/ط)
+    return max(cov, chars), hyp
 def tts(text, out, batch=0):
+    """One Gemini call. Returns 'ok', 'daily' (quota for today used up: stop, spend nothing more) or 'fail'.
+    A per-minute 429 waits for the server's retryDelay; 3 in a row are treated as the daily cap."""
     tf = tempfile.NamedTemporaryFile('w', delete=False, suffix='.txt'); tf.write(text); tf.close()
     if batch: os.environ['RW_TTS_BATCH'] = str(batch)
     else: os.environ.pop('RW_TTS_BATCH', None)
-    for attempt in range(6):
-        p = subprocess.run([sys.executable, 'tools/gemini_tts.py', tf.name, out], capture_output=True, text=True)
-        if p.returncode == 0: os.unlink(tf.name); return 'ok'
-        msg = (p.stdout + p.stderr)[-600:]
-        if p.returncode == 2:
-            if re.search(r'per.?day|PerDay|daily', msg, re.I): os.unlink(tf.name); return 'daily'
-            print('  429, sleeping 65s', flush=True); time.sleep(65); continue
-        print('  error', msg[-300:], flush=True); time.sleep(20)
-    os.unlink(tf.name); return 'fail'
+    r429 = errs = 0
+    try:
+        while True:
+            p = subprocess.run([sys.executable, 'tools/gemini_tts.py', tf.name, out], capture_output=True, text=True)
+            msg = (p.stdout + p.stderr)[-600:]
+            if p.returncode == 0: return 'ok'
+            if p.returncode == 3: print('  daily quota used up:', msg.strip()[:200], flush=True); return 'daily'
+            if p.returncode == 2:
+                r429 += 1
+                if r429 >= 3: print('  3x 429 in a row, treating as daily cap', flush=True); return 'daily'
+                m = re.search(r'RETRY (\d+)', msg); w = min(120, int(m.group(1)) + 5) if m else 65
+                print('  429 (per minute), sleeping %ds' % w, flush=True); time.sleep(w); continue
+            errs += 1; print('  error', msg[-300:], flush=True)
+            if errs >= 2: return 'fail'
+            time.sleep(20)
+    finally:
+        os.path.exists(tf.name) and os.unlink(tf.name)
 def write_index():
     idx = {k: v['v'] for k, v in sorted(man.items()) if os.path.exists('audio/%s.mp3' % k)}
     open('js/data/audio-index.js', 'w').write('/* cards with narration (Gemini TTS, voice Sulafat); value = cache version */\nwindow.RW_AUDIO = ' + json.dumps(idx, separators=(',', ':')) + ';\n')
@@ -54,8 +81,17 @@ def split(f, n, outs):
         args = ["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-i", f, "-ss", str(cuts[i])] + (["-to", str(cuts[i + 1])] if cuts[i + 1] else []) + ["-af", af, "-ac", "1", "-ar", "24000", "-c:a", "libmp3lame", "-b:a", "48k", o]
         subprocess.run(args, check=True)
     return True
-BATCH = int(os.environ.get('RW_BATCH', '5'))
+BATCH = int(os.environ.get('RW_BATCH', '1'))   # 1 card per request (batch splitting proved unreliable)
 cards = json.loads(subprocess.run(['node', 'tools/dump_cards.js'], capture_output=True, text=True, check=True).stdout)
+if len(sys.argv) > 1 and sys.argv[1] == 'check':
+    # free self-test (no API calls): re-score the clips already in audio/; they are known good, so a low median means the checker is broken
+    T = {c['aid']: c['text'] for c in cards}; res = []
+    for a in sorted(os.listdir('audio')):
+        aid = a[:-4]
+        if a.endswith('.mp3') and aid in T:
+            sc, hyp = score('audio/' + a, T[aid]); res.append(sc); print('%s %.2f' % (aid, sc), flush=True)
+    med = sorted(res)[len(res) // 2] if res else 0
+    print('median %.2f -> %s' % (med, 'CHECKER OK' if med >= 0.75 else 'CHECKER BROKEN'), flush=True); sys.exit(0 if med >= 0.75 else 1)
 todo = [c for c in cards if man.get(c['aid'], {}).get('h') != hashlib.md5(c['text'].encode()).hexdigest() or not os.path.exists('audio/%s.mp3' % c['aid'])]
 print(len(cards), 'cards,', len(todo), 'to narrate', flush=True)
 done = 0; stop = None; last = 0
@@ -94,6 +130,7 @@ for c in todo:
         if wait > 0: time.sleep(wait)
         last = time.time(); tmp = out + '.new.mp3'
         r = tts(c['text'], tmp)
+        if r == 'fail': print('%s failed, skipping' % c['aid'], flush=True); break
         if r != 'ok': stop = r; break
         sc, hyp = score(tmp, c['text'])
         print('%s try%d sim=%.2f' % (c['aid'], tri + 1, sc), flush=True)
