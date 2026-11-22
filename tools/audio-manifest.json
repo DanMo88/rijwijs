@@ -58,5 +58,70 @@
 "h": "e3c96295aed9d373aff9946021cee77e",
 "v": 5,
 "sim": 0.9
+},
+"plaats-02": {
+"h": "635f6f05d0ab3aa9f32a095ad87a5cc9",
+"v": 13,
+"sim": 0.89
+},
+"plaats-03": {
+"h": "9fd8008ebb2bd16026db9f5f13a43877",
+"v": 13,
+"sim": 0.95
+},
+"plaats-04": {
+"h": "38143b1a60ae7f9027e71747cc0d92d7",
+"v": 13,
+"sim": 0.83
+},
+"plaats-05": {
+"h": "e86d645f1c6dced708669bdaabda2367",
+"v": 13,
+"sim": 0.89
+},
+"plaats-06": {
+"h": "35c659a574da4f0095e044fa287fce40",
+"v": 13,
+"sim": 0.96
+},
+"plaats-07": {
+"h": "1aa55c415a4dbdbeb348983e974fb4d6",
+"v": 13,
+"sim": 0.86
+},
+"plaats-08": {
+"h": "4d42aa62e8086af5c18ec228e7411b1d",
+"v": 13,
+"sim": 0.89
+},
+"plaats-09": {
+"h": "c76510ef87ae0cb6ed4116dfbfd9c597",
+"v": 13,
+"sim": 0.92
+},
+"plaats-10": {
+"h": "898d66094e1567bcbe75c6a1ec9e087d",
+"v": 13,
+"sim": 0.8
+},
+"snel-01": {
+"h": "ad7b092afe932183490756b782508eee",
+"v": 13,
+"sim": 0.95
+},
+"snel-02": {
+"h": "f62ac6abc39b6ac09229d56f32ef01f9",
+"v": 13,
+"sim": 0.81
+},
+"snel-03": {
+"h": "c4532e221a54f0312aeb2b54c18b4da2",
+"v": 13,
+"sim": 0.7
+},
+"snel-04": {
+"h": "dbc8dfbc37e044bd40e6133ff687b969",
+"v": 13,
+"sim": 0.72
 }
 }

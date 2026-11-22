@@ -1,17 +1,4 @@
 # cards without narration (text + timer fallback in the app)
-plaats-02
-plaats-03
-plaats-04
-plaats-05
-plaats-06
-plaats-07
-plaats-08
-plaats-09
-plaats-10
-snel-01
-snel-02
-snel-03
-snel-04
 snel-05
 snel-06
 snel-07
@@ -284,4 +271,4 @@ aanh-08
 aanh-09
 aanh-10
 # low Whisper match (kept, check by ear)
-
+snel-03
