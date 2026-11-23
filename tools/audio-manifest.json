@@ -123,5 +123,25 @@
 "h": "dbc8dfbc37e044bd40e6133ff687b969",
 "v": 13,
 "sim": 0.72
+},
+"snel-05": {
+"h": "83124a1979e5eb9e74b0d78faee00834",
+"v": 14,
+"sim": 0.71
+},
+"snel-06": {
+"h": "05d1ba60436087caa3c0cd3ac5e59f4c",
+"v": 14,
+"sim": 0.8
+},
+"snel-07": {
+"h": "e1a38fd7efef6e2e0b22e0b1a6f37c67",
+"v": 14,
+"sim": 0.77
+},
+"snel-08": {
+"h": "f4950b9cecbc517e30b50a60bdc8be7b",
+"v": 14,
+"sim": 0.86
 }
 }

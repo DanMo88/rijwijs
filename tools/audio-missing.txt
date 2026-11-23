@@ -1,8 +1,4 @@
 # cards without narration (text + timer fallback in the app)
-snel-05
-snel-06
-snel-07
-snel-08
 snel-09
 snel-10
 inhaal-01
@@ -272,3 +268,4 @@ aanh-09
 aanh-10
 # low Whisper match (kept, check by ear)
 snel-03
+snel-05
