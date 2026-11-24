@@ -1,12 +1,4 @@
 # cards without narration (text + timer fallback in the app)
-snel-09
-snel-10
-inhaal-01
-inhaal-02
-inhaal-03
-inhaal-04
-inhaal-05
-inhaal-06
 inhaal-07
 inhaal-08
 inhaal-09

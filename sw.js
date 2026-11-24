@@ -1,5 +1,5 @@
 // CBR Daniel service worker · HTML network-first · assets stale-while-revalidate (audio and signs cached on first use)
-const V = 'cbrdaniel-v14';
+const V = 'cbrdaniel-v15';
 const JS = ['data/core', 'data/signs', 'data/ch1', 'data/ch2', 'data/ch3', 'data/ch4', 'data/ch5', 'data/ch6', 'data/ch7', 'data/ch8', 'data/audio-index', 'diagram', 'scenes', 'audio', 'app', 'install'];
 const SHELL = ['./', 'index.html', 'css/styles.css?v=5', 'manifest.webmanifest'].concat(JS.map(j => 'js/' + j + '.js?v=5'),
   ['fonts/Vazirmatn-Regular.woff2', 'fonts/Vazirmatn-Bold.woff2', 'fonts/Vazirmatn-Black.woff2', 'fonts/Fredoka-Bold.woff2',
