@@ -1,17 +1,4 @@
 # cards without narration (text + timer fallback in the app)
-inhaal-07
-inhaal-08
-inhaal-09
-inhaal-10
-park-01
-park-02
-park-03
-park-04
-park-05
-park-06
-park-07
-park-08
-park-09
 park-10
 afslaan-01
 afslaan-02
