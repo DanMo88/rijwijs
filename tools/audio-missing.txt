@@ -1,14 +1,4 @@
 # cards without narration (text + timer fallback in the app)
-afslaan-09
-afslaan-10
-roto-01
-roto-02
-roto-03
-roto-04
-roto-05
-roto-06
-roto-07
-roto-08
 manv-01
 manv-02
 manv-03
