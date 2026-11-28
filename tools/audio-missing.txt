@@ -1,15 +1,4 @@
 # cards without narration (text + timer fallback in the app)
-manv-01
-manv-02
-manv-03
-manv-04
-manv-05
-manv-06
-manv-07
-manv-08
-manv-09
-manv-10
-snelweg-01
 snelweg-02
 snelweg-03
 snelweg-04
